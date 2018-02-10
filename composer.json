@@ -1,0 +1,29 @@
+{
+    "name": "TheChipmunks/miravel",
+    "description": "Theme engine for Laravel",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Serhiy Neskhodovskiy",
+            "email": "sn@nom.ua"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Miravel\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Miravel\\ThemeServiceProvider"
+            ],
+            "aliases": {
+                "Miravel": "Miravel\\Facade"
+            }
+        }
+    }
+}
