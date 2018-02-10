@@ -45,8 +45,6 @@ Miravel\ThemeServiceProvider::class,
 ],
 ```
 
-Add the facade alias:
-
 ```php
 'aliases' => [
 //...
@@ -99,7 +97,7 @@ Inside your view:
 
 #### Override any layout or element
 
-To change the view file, just copy it from the ```vendor``` folder to ```app/resources/views/vendor/miravel/theme-name```. 
+To start playing with the view file, just copy it from the ```vendor``` folder to ```app/resources/views/vendor/miravel/theme-name```. 
 
 E.g. to override the "fixed" layout from the "default" theme, copy:
 
