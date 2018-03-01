@@ -1,7 +1,9 @@
 {
-    "name": "TheChipmunks/miravel",
+    "name": "miravel/miravel",
     "description": "Theme engine for Laravel",
     "type": "library",
+    "version": "0.0.1",
+    "source": ".",
     "license": "MIT",
     "authors": [
         {
@@ -9,7 +11,6 @@
             "email": "sn@nom.ua"
         }
     ],
-    "minimum-stability": "dev",
     "require": {},
     "autoload": {
         "psr-4": {

@@ -84,7 +84,7 @@ class ThemeServiceProvider extends ServiceProvider
 
         $this->publishes([
             $this->paths['themes'] => resource_path('views/vendor/miravel'),
-        ], 'views');
+        ], 'themes');
     }
 
     protected function registerBladeDirectives()
