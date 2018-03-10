@@ -30,8 +30,8 @@ class Utilities
 
     public static function findTemplateInDirectory($path)
     {
-        $templateFileName = config('miravel.template_file_name');
-        $extensions = config('miravel.template_file_extensions');
+        $templateFileName = (string)Miravel::getConfig('template_file_name');
+        $extensions       = (array) Miravel::getConfig('template_file_extensions');
 
         foreach ($extensions as $extension) {
             $filename = "$templateFileName.$extension";

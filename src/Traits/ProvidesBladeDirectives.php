@@ -30,7 +30,7 @@ trait ProvidesBladeDirectives
      *
      * @return string             the resulting php code.
      */
-    public function directiveThemeInclude(string $expression)
+    public function directiveThemeinclude(string $expression)
     {
         $expression = Blade::stripParentheses($expression);
         $expression = Utilities::stripQuotes($expression);

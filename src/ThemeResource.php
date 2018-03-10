@@ -29,7 +29,7 @@ class ThemeResource extends SplFileInfo
             return false;
         }
 
-        $regex    = $this->getTemplateExtensionRegex();
+        $regex    = $this->getTemplateFilenameRegex();
         $filename = $this->getFilename();
 
         return (bool)preg_match($regex, $filename);
@@ -72,9 +72,9 @@ class ThemeResource extends SplFileInfo
     /**
      * @return string
      */
-    protected function getTemplateExtensionRegex()
+    protected function getTemplateFilenameRegex()
     {
-        $extensions = Miravel::getConfig('template_file_extensions');
+        $extensions = (array)Miravel::getConfig('template_file_extensions');
         $extensions = array_map(
             function (string $item) {
                 return '\.' . preg_quote($item, '/');

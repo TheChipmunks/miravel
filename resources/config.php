@@ -2,19 +2,21 @@
 
 return [
     'html' => [
-        'charset' => 'utf-8',
-    ],
+        'doctype' => 'html',
 
-    'assets' => [
-        'storage'                      => [
-            'engine' => 'disk',
-            'path'   => 'public/miravel',
+        'html_tag_attributes' => [
+            'class' => 'no-js',
         ],
-        'enable_cache'                 => true,
-        'enable_route'                 => true,
-        'contatenation'                => true,
-        'enable_content_version_check' => true,
-        'enable_cache_busting'         => true,
+
+        'body_tag_attributes' => [
+            //
+        ],
+
+        'meta_tags' => [
+            ['charset' => 'utf-8'],
+            ['http-equiv' => 'X-UA-Compatible', 'content' => 'IE=edge'],
+            ['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1, shrink-to-fit=no'],
+        ],
     ],
 
     'template_file_extensions' => ['php', 'blade.php', 'phtml'],
@@ -24,21 +26,23 @@ return [
     'blade_directive_map' => [
 
         // the right part is variable, change to your liking
+        // note that the default version is a convention used in third party themes
+        // once you change a directive here, you'll have to search and replace its
+        // occurrences inside the view files, templates etc.
 
-        'themeInclude' => 'themeinclude',
-        'themeExtends' => 'themeextends',
+        // the left part is the default value. Do not change it.
+
+        'themeinclude' => 'themeinclude',
+        'themeextends' => 'themeextends',
         'element'      => 'element',
         'assets'       => 'assets',
-        'styles'       => 'styles',
-        'scripts'      => 'scripts',
-        'style'        => 'css',
-        'script'       => 'js',
-        'img'          => 'img',
+        'css'          => 'css',
+        'js'           => 'js',
     ],
 
-    'link_patterns' => [
-        'css' => '<link href="%url%" rel="stylesheet" type="text/css" />',
-        'js'  => '<script src="%url%"></script>',
+    'tag_templates' => [
+        'css'  => '<link href="%url%" rel="stylesheet" type="text/css">',
+        'js'   => '<script src="%url%"></script>',
     ],
 
     'log' => [

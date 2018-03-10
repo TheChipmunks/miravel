@@ -32,13 +32,13 @@ class LayoutFactory extends BaseViewFactory
      */
     public static function make(string $name)
     {
-        $path = static::resolveResource($name);
+        $resource = static::resolveResource($name);
 
-        if (!$path) {
+        if (!$resource) {
             Miravel::exception(LayoutNotFoundException::class, compact('name'), __FILE__, __LINE__);
         }
 
-        $layout = new Layout($path);
+        $layout = new Layout($resource);
 
         if ($layout->exists()) {
             return $layout;

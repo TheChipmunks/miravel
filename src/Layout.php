@@ -27,23 +27,18 @@ class Layout
     protected $theme;
 
     /**
+     * @var ThemeResource
+     */
+    protected $resource;
+
+    /**
      * Layout constructor.
      *
-     * @param string $path  the path to the layout template
+     * @param ThemeResource $resource
      */
-    public function __construct(string $path)
+    public function __construct(ThemeResource $resource)
     {
-        $templateFile = is_dir($path) ?
-            Utilities::findTemplateInDirectory($path) :
-            $path;
-
-        $this->setPath($templateFile);
-
-        $this->setName(Utilities::getTemplateBaseName($templateFile));
-
-        if ($theme = Utilities::pathBelongsToTheme($templateFile)) {
-            $this->setTheme($theme);
-        }
+        $this->setResource($resource);
     }
 
     /**
@@ -126,5 +121,29 @@ class Layout
         $this->path = $path;
 
         return $this;
+    }
+
+    public function setResource(ThemeResource $resource)
+    {
+        $this->resource = $resource;
+
+        $path = $resource->getViewFile();
+
+        // set the path to the template file
+        if ($path) {
+            $this->setPath($path);
+        }
+
+        // set the name
+        if ($resource->isDir()) {
+            $this->setName($resource->getBasename());
+        } elseif ($path) {
+            $this->setName(Utilities::getTemplateBaseName($path));
+        }
+
+        // set the theme
+        if ($path && ($theme = Utilities::pathBelongsToTheme($this->path))) {
+            $this->setTheme($theme);
+        }
     }
 }
