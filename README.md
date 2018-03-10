@@ -5,6 +5,8 @@ Miravel is currently a work in progress and cannot yet be used in real projects.
 # Miravel
 A theme engine for the Laravel framework, with its own theme repository, and with the ability for everyone to develop and contribute their own themes.
 
+The full documentation is available at: https://miravel.io/docs
+
 ### Features:
 
 - Miravel comes with a default theme that already contains most popular layouts: fluid, fixed width, one- and two-column, sticky footer, form centered on a screen etc.
@@ -28,7 +30,7 @@ Quick dive into using Miravel with your Laravel project:
 #### Pull in the package
 
 ```bash
-composer require thechipmunks/miravel
+composer require miravel/miravel
 ```
 
 #### Laravel 5.4 or earlier, or Laravel 5.5 without auto-discovery
@@ -51,12 +53,6 @@ Miravel\ThemeServiceProvider::class,
 'Miravel' => Miravel\Facade::class,
 //...
 ],
-```
-
-#### Publish the assets
-
-```bash
-php artisan vendor:publish --provider="Miravel\ThemeServiceProvider"
 ```
 
 #### Use a template
@@ -110,19 +106,19 @@ _app/resources/views/vendor/miravel/**default/layouts/fixed/view.blade.php**_
 Miravel offer an artisan one-liner for this operation to somewhat shorten your typing:
 
 ```bash
-php artisan miravel:change default.layouts.fixed.view
+php artisan miravel:clone default.layouts.fixed.view
 ```
 
 or to pull the entire layout (with all styles and scripts)
 
 ```bash
-php artisan miravel:change default.layouts.fixed
+php artisan miravel:clone default.layouts.fixed
 ```
 
 to pull the entire theme
 
 ```bash
-php artisan miravel:change default
+php artisan miravel:clone default
 ```
 
 You get the idea.
