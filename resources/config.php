@@ -75,4 +75,8 @@ return [
         'permissions'       => 0644,
     ],
 
+    'theme_sources' => [
+        'default' => Miravel\Sources\Marketplace::class,
+    ]
+
 ];
