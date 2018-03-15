@@ -76,7 +76,11 @@ return [
     ],
 
     'theme_sources' => [
-        'default' => Miravel\Sources\Marketplace::class,
+        'default' => [
+            'handler'  => Miravel\Sources\Marketplace::class,
+            'username' => '', // for paid themes
+            'password' => '', // for paid themes
+        ]
     ]
 
 ];
