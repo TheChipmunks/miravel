@@ -79,8 +79,14 @@ return [
         'default' => [
             'handler'  => Miravel\Sources\Marketplace::class,
             'username' => '', // for paid themes
-            'password' => '', // for paid themes
+            'key'      => '', // for paid themes
         ]
+    ],
+
+    'paths' => [
+        'vendor' => 'vendor/miravel/resources/themes',
+        'app'    => 'resources/views/vendor/miravel',
+        'public' => 'public/miravel'
     ]
 
 ];
