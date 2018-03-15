@@ -38,6 +38,7 @@ return [
         'assets'       => 'assets',
         'css'          => 'css',
         'js'           => 'js',
+        'url'          => 'url',
     ],
 
     'tag_templates' => [
@@ -86,7 +87,10 @@ return [
     'paths' => [
         'vendor' => 'vendor/miravel/resources/themes',
         'app'    => 'resources/views/vendor/miravel',
-        'public' => 'public/miravel'
+        'public' => 'public/miravel',
+        'views'  => 'resources/views',
+
+        'web'    => '/miravel',
     ]
 
 ];
