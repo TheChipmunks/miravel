@@ -2,8 +2,8 @@
 
 namespace Miravel;
 
-use Miravel;
-use Blade;
+use Miravel\Facade as MiravelFacade;
+use Illuminate\Support\Facades\Blade;
 
 /**
  * Class BladeCompilerExtension
@@ -134,7 +134,7 @@ EOF;
     protected function getExtendDirectiveAlias(): string
     {
         $default = 'themeextends';
-        $name    = Miravel::getConfig(
+        $name    = MiravelFacade::getConfig(
             'blade_directive_map.themeextends',
             $default
         );

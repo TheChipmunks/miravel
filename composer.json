@@ -20,8 +20,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Miravel\\ThemeServiceProvider",
-                "Miravel\\Providers\\CommandProvider"
+                "Miravel\\Providers\\ThemeServiceProvider",
+                "Miravel\\Providers\\CommandServiceProvider"
             ],
             "aliases": {
                 "Miravel": "Miravel\\Facade"

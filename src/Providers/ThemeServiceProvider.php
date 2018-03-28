@@ -1,16 +1,17 @@
 <?php
 
-namespace Miravel;
+namespace Miravel\Providers;
 
+use Miravel\Facade as Miravel;
 use Illuminate\Support\ServiceProvider;
-use Blade;
-use View;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View;
 
 class ThemeServiceProvider extends ServiceProvider
 {
     protected $paths = [
-        'config' => __DIR__ . '/../resources/config.php',
-        'themes' => __DIR__ . '/../resources/themes',
+        'config' => __DIR__ . '/../../resources/config.php',
+        'themes' => __DIR__ . '/../../resources/themes',
     ];
 
     // protected $defer = true;
@@ -45,21 +46,21 @@ class ThemeServiceProvider extends ServiceProvider
     protected function registerMiravelService()
     {
         $this->app->singleton('miravel', function () {
-            return new Miravel;
+            return new \Miravel\Miravel();
         });
 	}
 
     protected function registerViewNameComposer()
     {
         View::composer('*', function($view) {
-            \Miravel::composer($view);
+            Miravel::composer($view);
         });
     }
 
     protected function registerViewFileFinder()
     {
         $this->app->singleton('view.finder', function($app) {
-            return new FileViewFinder(
+            return new \Miravel\FileViewFinder(
                 $app['files'],
                 $app['config']['view.paths'],
                 null
@@ -70,7 +71,7 @@ class ThemeServiceProvider extends ServiceProvider
     protected function registerBladeExtension()
     {
         Blade::extend(function ($viewContents) {
-            $compiler = new BladeCompilerExtension($viewContents);
+            $compiler = new \Miravel\BladeCompilerExtension($viewContents);
 
             return $compiler->process();
         });

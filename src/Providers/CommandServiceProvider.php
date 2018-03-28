@@ -1,12 +1,11 @@
 <?php
+
 namespace Miravel\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Miravel\Console\Kernel as MiravelKernel;
-use Illuminate\Contracts\Console\Kernel as LaravelKernel;
 use Miravel\Console\Commands\BuildCommand;
 
-class CommandProvider extends ServiceProvider
+class CommandServiceProvider extends ServiceProvider
 {
     
     protected $defer = true;

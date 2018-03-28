@@ -2,7 +2,6 @@
 
 namespace Miravel;
 
-use Illuminate\View\FileViewFinder;
 use InvalidArgumentException;
 
 class ViewNameParser
@@ -112,7 +111,7 @@ class ViewNameParser
 
     protected function parse(string $viewName)
     {
-        $namespaceDelimiter = FileViewFinder::HINT_PATH_DELIMITER;
+        $namespaceDelimiter = \Illuminate\View\FileViewFinder::HINT_PATH_DELIMITER;
 
         $segments = explode($namespaceDelimiter, $viewName);
 

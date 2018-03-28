@@ -85,8 +85,8 @@ return [
     ],
 
     'paths' => [
-        'vendor' => 'vendor/miravel/resources/themes',
-        'app'    => 'resources/views/vendor/miravel',
+        'vendor' => 'vendor/miravel/miravel/resources/themes',
+        'app'    => 'resources/views/vendor/miravel/miravel',
         'public' => 'public/miravel',
         'views'  => 'resources/views',
 
