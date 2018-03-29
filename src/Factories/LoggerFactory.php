@@ -241,14 +241,14 @@ class LoggerFactory
     protected static function extractMonolog(LoggerInterface $log)
     {
         // laravel 5.5 and below
-        if (is_callable([$log, 'getMonolog'])) {
+        if (method_exists($log, 'getMonolog')) {
             return Log::getMonolog();
         }
 
         // laravel 5.6 and above
-        if (is_callable([$log, 'driver'])) {
+        if (method_exists($log, 'driver')) {
             $driver = $log->driver();
-            if (is_callable([$driver, 'getLogger'])) {
+            if (method_exists($driver, 'getLogger')) {
                 $logger = $driver->getLogger();
                 if (is_subclass_of($logger, MonologLogger::class)) {
                     return $logger;
