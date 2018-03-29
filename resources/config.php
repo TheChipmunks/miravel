@@ -78,7 +78,7 @@ return [
 
     'theme_sources' => [
         'default' => [
-            'handler'  => Miravel\Sources\Marketplace::class,
+            'handler'  => Miravel\ThemeSources\Marketplace::class,
             'username' => '', // for paid themes
             'key'      => '', // for paid themes
         ]

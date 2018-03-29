@@ -1,6 +1,6 @@
 <?php
 
-namespace Miravel\Sources;
+namespace Miravel\ThemeSources;
 
 interface ThemeSourceInterface
 {
