@@ -39,11 +39,7 @@ class ElementFactory extends BaseViewFactory
      *
      * @return Element        the instantiated element.
      */
-    public static function make(
-        string $name,
-        $data = [],
-        array $options = []
-    ): Element {
+    public static function make(string $name, $data = [], array $options = []): Element {
         if (!$resource = static::resolveResource($name)) {
             Miravel::exception(ElementNotFoundException::class, compact('name'), __FILE__, __LINE__);
         }
@@ -81,8 +77,7 @@ class ElementFactory extends BaseViewFactory
         }
 
         // see if class file contains a valid class definition
-        if (!$className = Utilities::extractClassNameFromFile($classFilePath))
-        {
+        if (!$className = Utilities::extractClassNameFromFile($classFilePath)) {
             return;
         }
 

@@ -64,14 +64,25 @@ class LoggerFactory
         $name   = $config['name'] ?? 'miravel';
         $level  = $config['level'] ?? null;
 
-        $logger = Log::getMonolog()->withName($name);
+        $log    = app()->make('log');
 
-        // change the logging level if necessary
-        if ($level) {
-            static::setLoggingLevel($logger, $level);
+        // try to extract Monolog so we can set name and logging level
+        $monolog = static::extractMonolog($log);
+
+        if (!is_subclass_of($monolog, MonologLogger::class)) {
+            // but don't get too much upset if we can't
+            // hopefully Laravel will always have a LoggerInterface in its
+            // service container
+            return $log;
         }
 
-        return $logger;
+        // now we have a Monolog so we can set logging level and name
+        $monolog = $monolog->withName($name);
+        if ($level) {
+            static::setLoggingLevel($monolog, $level);
+        }
+
+        return $monolog;
     }
 
     /**
@@ -207,7 +218,7 @@ class LoggerFactory
      * @param string $level            the logging level, see Psr\Log\LogLevel
      */
     protected static function setLoggingLevel(
-        LoggerInterface $logger,
+        MonologLogger $logger,
         string $level
     ) {
         $handlers = $logger->getHandlers();
@@ -217,6 +228,35 @@ class LoggerFactory
             }
         }
     }
+
+    /**
+     * Trying to get the underlying Monolog instance from whatever logger is
+     * available in Laravel app, so we can set the channel name and log level
+     * in the known way.
+     *
+     * @param LoggerInterface $log
+     *
+     * @return MonologLogger|void
+     */
+    protected static function extractMonolog(LoggerInterface $log)
+    {
+        // laravel 5.5 and below
+        if (is_callable([$log, 'getMonolog'])) {
+            return Log::getMonolog();
+        }
+
+        // laravel 5.6 and above
+        if (is_callable([$log, 'driver'])) {
+            $driver = $log->driver();
+            if (is_callable([$driver, 'getLogger'])) {
+                $logger = $driver->getLogger();
+                if (is_subclass_of($logger, MonologLogger::class)) {
+                    return $logger;
+                }
+            }
+        }
+    }
+
 }
 
 

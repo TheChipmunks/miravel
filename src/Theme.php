@@ -109,9 +109,9 @@ class Theme
      * Get the directories where the files belonging to this theme might be
      * located. Normally, there are two paths:
      * - in the application (resources/views/vendor/miravel)
-     * - in the vendor directory (vendor/miravel/resources/themes)
+     * - in the vendor directory (vendor/miravel/miravel/resources/themes)
      *
-     * First, a theme file is sought in the application directory and if missing,
+     * First, a theme file is sought in the app scope and if missing,
      * in the vendor directory.
      *
      * This function returns the paths without the theme name appended yet.
@@ -136,6 +136,7 @@ class Theme
                 }
             }
 
+            // make sure app is always first
             ksort($result);
 
             static::$themeDirPaths = $result;
