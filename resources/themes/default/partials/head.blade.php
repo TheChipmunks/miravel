@@ -11,6 +11,3 @@
 @isset($document['keywords'])
 <meta name="keywords" content="{{ $document['keywords'] }}">
 @endisset
-
-{!! Miravel::css('styles') !!}
-{!! Miravel::js('js/head') !!}

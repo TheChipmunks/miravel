@@ -183,10 +183,10 @@ class Theme
     public function initParentTheme()
     {
         if (
-            isset($this->config['extend']) &&
-            is_string($this->config['extend'])
+            isset($this->config['extends']) &&
+            is_string($this->config['extends'])
         ) {
-            $parentTheme = Miravel::makeTheme($this->config['extend']);
+            $parentTheme = Miravel::makeTheme($this->config['extends']);
             $this->setParentTheme($parentTheme);
         }
     }
