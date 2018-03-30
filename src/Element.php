@@ -31,7 +31,7 @@ class Element
     /**
      * @var string
      */
-    protected $dataVarName;
+    protected $dataVarName = 'data';
 
     /**
      * @var ThemeResource
