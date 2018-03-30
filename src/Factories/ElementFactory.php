@@ -6,7 +6,7 @@ use Miravel\Exceptions\ElementNotFoundException;
 use Miravel\ThemeResource;
 use Miravel\Utilities;
 use Miravel\Element;
-use Miravel\Facade as MiravelFacade;
+use Miravel;
 
 /**
  * Class ElementFactory
@@ -41,7 +41,7 @@ class ElementFactory extends BaseViewFactory
      */
     public static function make(string $name, $data = [], array $options = []): Element {
         if (!$resource = static::resolveResource($name)) {
-            MiravelFacade::exception(ElementNotFoundException::class, compact('name'), __FILE__, __LINE__);
+            Miravel::exception(ElementNotFoundException::class, compact('name'), __FILE__, __LINE__);
         }
 
         $className = static::getCustomClassName($resource);

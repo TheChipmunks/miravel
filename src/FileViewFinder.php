@@ -4,7 +4,7 @@ namespace Miravel;
 
 use Illuminate\View\FileViewFinder as LaravelFileViewFinder;
 
-use Miravel\Facade as MiravelFacade;
+use Miravel;
 
 /**
  * Class FileViewFinder
@@ -39,7 +39,7 @@ class FileViewFinder extends LaravelFileViewFinder
 
         if ($parser->isMiravelNamespacedView()) {
             $themeName = $parser->getTheme();
-            $theme     = MiravelFacade::makeAndValidateTheme($themeName);
+            $theme     = Miravel::makeAndValidateTheme($themeName);
 
             // miravel::theme.elements.name becomes just elements.name
             $relative  = $this->getNameRelativeToTheme($parser);

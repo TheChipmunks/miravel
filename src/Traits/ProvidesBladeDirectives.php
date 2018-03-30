@@ -5,7 +5,7 @@ namespace Miravel\Traits;
 use Miravel\Exceptions\ViewResolvingException;
 use Miravel\Utilities;
 use Exception;
-use Miravel\Facade as MiravelFacade;
+use Miravel;
 use Blade;
 
 /**
@@ -54,7 +54,7 @@ trait ProvidesBladeDirectives
         $expression = Blade::stripParentheses($expression);
 
         $directive = <<<'EOF'
-<?php echo MiravelFacade::element(%s) ?>
+<?php echo Miravel::element(%s) ?>
 EOF;
 
         return sprintf($directive, $expression);
@@ -133,7 +133,7 @@ EOF;
         } catch (Exception $exception) {
             Throw new ViewResolvingException([
                 'directive'   => $forDirective,
-                'callingview' => MiravelFacade::getCurrentView(),
+                'callingview' => Miravel::getCurrentView(),
                 'error'       => $expression->getMessage(),
             ]);
         }
@@ -161,11 +161,11 @@ EOF;
      */
     protected function resolveThemeView($expression)
     {
-        if (!$view = MiravelFacade::getCurrentView()) {
+        if (!$view = Miravel::getCurrentView()) {
             throw new Exception('unable to figure out current view');
         }
 
-        if (!$theme = MiravelFacade::getCurrentViewParentTheme()) {
+        if (!$theme = Miravel::getCurrentViewParentTheme()) {
             throw new Exception('unable to figure out current theme');
         }
 

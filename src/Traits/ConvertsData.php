@@ -10,7 +10,7 @@ use IteratorAggregate;
 use Traversable;
 use Throwable;
 use stdClass;
-use Miravel\Facade as MiravelFacade;
+use Miravel;
 
 /**
  * Trait ConvertsData
@@ -144,7 +144,7 @@ trait ConvertsData
                 return [$item];
 
             default:
-                MiravelFacade::exception(UnknownDataTypeException::class, ['name' => $this->name ?? ''], __FILE__, __LINE__);
+                Miravel::exception(UnknownDataTypeException::class, ['name' => $this->name ?? ''], __FILE__, __LINE__);
         }
     }
 
@@ -184,7 +184,7 @@ trait ConvertsData
                 return collect([$item]);
 
             default:
-                MiravelFacade::exception(UnknownDataTypeException::class, ['name' => $this->name ?? ''], __FILE__, __LINE__);
+                Miravel::exception(UnknownDataTypeException::class, ['name' => $this->name ?? ''], __FILE__, __LINE__);
         }
     }
 
@@ -265,7 +265,7 @@ trait ConvertsData
         try {
             $result = (string)$this->data;
         } catch (Throwable $e) {
-            MiravelFacade::warning(sprintf(
+            Miravel::warning(sprintf(
                 'Element "%s" failed to convert data to a string',
                 ($this->name ?? '')
             ));
@@ -494,7 +494,7 @@ trait ConvertsData
     protected function requireCollection($file, $line)
     {
         if (!$this->data instanceof Collection) {
-            MiravelFacade::exception(
+            Miravel::exception(
                 InvalidDataTypeException::class,
                 [
                     'element'  => $this->name ?? '',
@@ -518,7 +518,7 @@ trait ConvertsData
     protected function requireTraversable($file, $line)
     {
         if (!$this->data instanceof Traversable) {
-            MiravelFacade::exception(
+            Miravel::exception(
                 InvalidDataTypeException::class,
                 [
                     'element'  => $this->name ?? '',

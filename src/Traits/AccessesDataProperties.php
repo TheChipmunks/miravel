@@ -3,7 +3,7 @@
 namespace Miravel\Traits;
 
 use InvalidArgumentException;
-use Miravel\Facade as MiravelFacade;
+use Miravel;
 use Miravel\Exceptions\EmptyItemProperty;
 
 /**
@@ -59,7 +59,7 @@ trait AccessesDataProperties
         $property = $this->getMappedPropertyName($property);
 
         if (empty($property)) {
-            MiravelFacade::exception(EmptyItemProperty::class, compact('original'), __FILE__, __LINE__);
+            Miravel::exception(EmptyItemProperty::class, compact('original'), __FILE__, __LINE__);
         }
 
         if (is_object($item)) {
@@ -88,7 +88,7 @@ trait AccessesDataProperties
         $propertyName = $this->getMappedPropertyName($propertyName);
 
         if (empty($propertyName)) {
-            MiravelFacade::exception(EmptyItemProperty::class, compact('original'), __FILE__, __LINE__);
+            Miravel::exception(EmptyItemProperty::class, compact('original'), __FILE__, __LINE__);
         }
 
         if (is_object($data)) {
@@ -142,7 +142,7 @@ trait AccessesDataProperties
      */
     protected function failToGetProperty(string $property)
     {
-        MiravelFacade::warning(sprintf(
+        Miravel::warning(sprintf(
             'Could not get a property %s from the item, ' .
             'because item is neither an array nor an object',
 
