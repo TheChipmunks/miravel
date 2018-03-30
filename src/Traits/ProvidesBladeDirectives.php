@@ -76,6 +76,35 @@ EOF;
     }
 
     /**
+     * Render some property of the element data object.
+     *
+     * @param $expression  the expression supplied by the user
+     *
+     * @return string      the code to render the property
+     */
+    public function directiveProp($expression)
+    {
+        $directive = '<?php echo $element->get(%s); ?>';
+        $directive = sprintf($directive, $expression);
+
+        return $directive;
+    }
+
+    public function directiveEprop($expression)
+    {
+        $directive = '<?php echo e($element->get(%s)); ?>';
+        $directive = sprintf($directive, $expression);
+
+        return $directive;
+    }
+
+
+
+
+
+
+
+    /**
      * Resolve the view name relative to the theme and return the code that will
      * render this view.
      *
@@ -143,13 +172,5 @@ EOF;
         }
 
         return $path;
-    }
-
-    protected function directiveProp($expression)
-    {
-        $directive = '<?php echo $element->get(%s); ?>';
-        $directive = sprintf($directive, $expression);
-
-        return $directive;
     }
 }

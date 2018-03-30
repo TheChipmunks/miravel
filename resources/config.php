@@ -40,6 +40,7 @@ return [
         'js'           => 'js',
         'url'          => 'url',
         'prop'         => 'prop',
+        'eprop'        => 'eprop'
     ],
 
     'tag_templates' => [
