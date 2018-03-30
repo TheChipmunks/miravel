@@ -6,7 +6,6 @@ use Monolog\Processor\PsrLogMessageProcessor;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Logger as MonologLogger;
-use Miravel\Facade as MiravelFacade;
 use Monolog\Handler\StreamHandler;
 use Psr\Log\LoggerInterface;
 use Miravel\Utilities;
@@ -206,7 +205,7 @@ class LoggerFactory
      */
     protected static function getConfig(): array
     {
-        return (array)MiravelFacade::getConfig('log');
+        return (array)config('miravel.log');
     }
 
     /**
