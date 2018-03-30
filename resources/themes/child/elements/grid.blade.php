@@ -1,5 +1,5 @@
 <div class="grid" style="float: left;width:728px;">
-@foreach($element->getData() as $item)
+@foreach($data as $item)
     @element('cell', $item, ['property_map' => ['name' => 'title']])
 @endforeach
 </div>

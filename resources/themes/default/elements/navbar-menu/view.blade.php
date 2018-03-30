@@ -8,7 +8,7 @@
             if ($loop->last) $cssClasses[]  = 'last';
         @endphp
         <li class="{{ implode(' ', $cssClasses) }}">
-            <a href="{{ $element->get($item, 'url') }}">{{ $element->get($item, 'text') }}</a>
+            <a href="@prop('item.url')">@prop('item.text')</a>
         </li>
     @endforeach
 </ul>
