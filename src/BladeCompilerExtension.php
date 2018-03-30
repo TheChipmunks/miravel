@@ -2,6 +2,7 @@
 
 namespace Miravel;
 
+use Miravel\Traits\ProvidesBladeDirectives;
 use Miravel;
 use Blade;
 
@@ -15,6 +16,8 @@ use Blade;
  */
 class BladeCompilerExtension
 {
+    use ProvidesBladeDirectives;
+
     /**
      * @var array
      */
@@ -72,11 +75,13 @@ class BladeCompilerExtension
      * Process the "themeextends" directives in the file, adding a custom footer
      * for each one (there shouldn't be more than one, really).
      *
-     * @param array $matches  the array of detected directives
+     * @param array $matches the array of detected directives
      *
      * @return string         the directives will be removed, i.e. replaced by
      *                        an empty string. That's how Laravel's native
      *                        "extends" also works.
+     *
+     * @throws Exceptions\ViewResolvingException
      */
     protected function processThemeExtendsDirective(array $matches): string
     {
@@ -105,24 +110,12 @@ class BladeCompilerExtension
      *                     layout name, normally).
      *
      * @return string      the php code rendering the layout.
+     *
+     * @throws Exceptions\ViewResolvingException
      */
     protected function getFooterExpression($expression): string
     {
-        $expression = Blade::stripParentheses($expression);
-        $expression = Utilities::stripQuotes($expression);
-
-        $path = strval(ResourceResolver::resolveLayout($expression));
-
-        $directive = <<<'EOF'
-<?php
-    echo $__env->file(
-        '%s', 
-        array_except(get_defined_vars(), ['__data', '__path'])
-    )->render();
-?>
-EOF;
-
-        return sprintf($directive, $path);
+        return $this->themeextends($expression);
     }
 
     /**

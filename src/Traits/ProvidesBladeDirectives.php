@@ -2,6 +2,8 @@
 
 namespace Miravel\Traits;
 
+use Exception;
+use Miravel\Exceptions\ViewResolvingException;
 use Miravel\Utilities;
 use Miravel;
 use Blade;
@@ -29,28 +31,27 @@ trait ProvidesBladeDirectives
      * @param string $expression  the arguments to the directive.
      *
      * @return string             the resulting php code.
+     *
+     * @throws ViewResolvingException
      */
     public function directiveThemeinclude(string $expression)
     {
-        $expression = Blade::stripParentheses($expression);
-        $expression = Utilities::stripQuotes($expression);
-        $theme      = Miravel::getCurrentViewParentTheme();
-        $path       = '';
+        return $this->getViewRenderCode($expression, 'themeinclude');
+    }
 
-        if ($theme) {
-            $path = strval($theme->getViewFile($expression));
-        }
-
-        $directive = <<<'EOF'
-<?php
-    echo $__env->file(
-        '%s', 
-        array_except(get_defined_vars(), ['__data', '__path'])
-    )->render();
-?>
-EOF;
-
-        return sprintf($directive, $path);
+    /**
+     * This one is used by BladeCompilerExtendion rather that added as a regular
+     * directive, hence no word "directive" in the name
+     *
+     * @param string $expression  the name of the view to extend
+     *
+     * @returns string            the code that renders the extended view
+     *
+     * @throws ViewResolvingException
+     */
+    public function themeextends(string $expression)
+    {
+        return $this->getViewRenderCode($expression, 'themeextends');
     }
 
     /**
@@ -72,5 +73,75 @@ EOF;
 EOF;
 
         return sprintf($directive, $expression);
+    }
+
+    /**
+     * Resolve the view name relative to the theme and return the code that will
+     * render this view.
+     *
+     * @param string $expression the view name relative to the current theme
+     *
+     * @param string $forDirective the directive name, so we can make our
+     *                              Exceptions more informative
+     *
+     * @return string               the code to insert in the compiled view
+     *
+     * @throws ViewResolvingException
+     */
+    protected function getViewRenderCode(string $expression, string $forDirective): string
+    {
+        $expression = Blade::stripParentheses($expression);
+        $expression = Utilities::stripQuotes($expression);
+
+        try {
+            $path = $this->resolveThemeView($expression);
+        } catch (Exception $exception) {
+            Throw new ViewResolvingException([
+                'directive'   => $forDirective,
+                'callingview' => Miravel::getCurrentView(),
+                'error'       => $expression->getMessage(),
+            ]);
+        }
+
+        $directive = <<<'EOF'
+<?php
+    echo $__env->file(
+        '%s', 
+        array_except(get_defined_vars(), ['__data', '__path'])
+    )->render();
+?>
+EOF;
+
+        return sprintf($directive, $path);
+    }
+
+    /**
+     * Resolve the view name relative to current theme.
+     *
+     * @param $expression  the view name to resolve
+     *
+     * @return string      the resolved view path
+     *
+     * @throws Exception
+     */
+    protected function resolveThemeView($expression)
+    {
+        if (!$view = Miravel::getCurrentView()) {
+            throw new Exception('unable to figure out current view');
+        }
+
+        if (!$theme = Miravel::getCurrentViewParentTheme()) {
+            throw new Exception('unable to figure out current theme');
+        }
+
+        if (!$path = $theme->getViewFile($expression)) {
+            throw new Exception(sprintf(
+                'unable to resolve view "%s" from theme "%s"',
+                $expression,
+                $theme->getName()
+            ));
+        }
+
+        return $path;
     }
 }
