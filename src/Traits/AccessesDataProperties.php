@@ -45,6 +45,10 @@ trait AccessesDataProperties
     {
         $elements = Utilities::parseDataAccessExpression($key);
 
+        if (empty($vartable)) {
+            $vartable = $this->getData();
+        }
+
         if (!$value = $vartable[$elements['varname']]) {
             $this->failToGetProperty($key);
 
