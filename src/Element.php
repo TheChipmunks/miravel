@@ -16,7 +16,7 @@ use View;
  */
 class Element
 {
-    use AccessesDataProperties, ExpectsDataFormats, hasOptions;
+    use AccessesDataProperties, ExpectsDataFormats, HasOptions;
 
     /**
      * @var string
