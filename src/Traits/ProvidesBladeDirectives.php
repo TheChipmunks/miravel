@@ -71,7 +71,7 @@ EOF;
     {
         $expression = Blade::stripParentheses($expression);
 
-        $directive = '<?php echo $element->get(%s); ?>';
+        $directive = '<?php echo $element->get(%s, get_defined_vars()); ?>';
         $directive = sprintf($directive, $expression);
 
         return $directive;
@@ -88,7 +88,7 @@ EOF;
     {
         $expression = Blade::stripParentheses($expression);
 
-        $directive = '<?php echo e($element->get(%s)); ?>';
+        $directive = '<?php echo e($element->get(%s, get_defined_vars())); ?>';
         $directive = sprintf($directive, $expression);
 
         return $directive;

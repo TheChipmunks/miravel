@@ -4,7 +4,7 @@ namespace Miravel\Traits;
 
 use Miravel\Exceptions\InvalidItemProperty;
 use Miravel\Facade as MiravelFacade;
-use InvalidArgumentException;
+use Miravel\Utilities;
 
 /**
  * Trait AccessesDataProperties
@@ -43,7 +43,36 @@ trait AccessesDataProperties
 
     protected function getMultilevelProperty(string $key, array $vartable)
     {
+        $elements = Utilities::parseDataAccessExpression($key);
 
+        if (!$value = $vartable[$elements['varname']]) {
+            $this->failToGetProperty($key);
+
+            return;
+        }
+
+        if (empty($elements['steps'])) {
+            return $value;
+        }
+
+        $steps = $elements['steps'];
+
+        foreach ($steps as $step) {
+            switch (gettype($value)) {
+                case 'object':
+                    $value = $value->$step ?? null;
+                    break;
+                case 'array':
+                    $value = $value[$step] ?? null;
+                    break;
+                default:
+                    $this->failToGetProperty($key);
+
+                    return;
+            }
+        }
+
+        return $value;
     }
 
     /**
@@ -54,9 +83,7 @@ trait AccessesDataProperties
     protected function failToGetProperty(string $property)
     {
         MiravelFacade::warning(sprintf(
-            'Could not get a property %s from the item, ' .
-            'because item is neither an array nor an object',
-
+            'Failed to get a property %s from element data.',
             $property
         ));
     }

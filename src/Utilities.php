@@ -220,11 +220,9 @@ class Utilities
 
     public static function parseDataAccessExpression($expression)
     {
-        $parts = explode('.', $expression);
+        $steps   = explode('.', $expression);
+        $varname = count($steps) ? array_shift($steps) : '';
 
-        $varname = count($parts) ? array_shift($parts) : '';
-        $key     = count($parts) ? implode('.', $parts) : null;
-
-        return compact('varname', 'key');
+        return compact('varname', 'steps');
     }
 }
