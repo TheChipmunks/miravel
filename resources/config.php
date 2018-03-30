@@ -39,6 +39,7 @@ return [
         'css'          => 'css',
         'js'           => 'js',
         'url'          => 'url',
+        'prop'         => 'prop',
     ],
 
     'tag_templates' => [

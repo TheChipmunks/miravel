@@ -144,4 +144,12 @@ EOF;
 
         return $path;
     }
+
+    protected function directiveProp($expression)
+    {
+        $directive = '<?php echo $element->get(%s); ?>';
+        $directive = sprintf($directive, $expression);
+
+        return $directive;
+    }
 }
