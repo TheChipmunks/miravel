@@ -3,7 +3,7 @@
 namespace Miravel;
 
 use Miravel\Traits\ProvidesBladeDirectives;
-use Miravel;
+use Miravel\Facade as MiravelFacade;
 use Blade;
 
 /**
@@ -127,7 +127,7 @@ class BladeCompilerExtension
     protected function getExtendDirectiveAlias(): string
     {
         $default = 'themeextends';
-        $name    = Miravel::getConfig(
+        $name    = MiravelFacade::getConfig(
             'blade_directive_map.themeextends',
             $default
         );

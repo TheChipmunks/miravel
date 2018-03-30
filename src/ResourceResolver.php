@@ -2,7 +2,7 @@
 
 namespace Miravel;
 
-use Miravel;
+use Miravel\Facade as MiravelFacade;
 
 /**
  * Class ResourceResolver
@@ -126,7 +126,7 @@ class ResourceResolver
      */
     protected function resolveFromTheme(string $themeName, string $resourceName)
     {
-        $theme = Miravel::makeTheme($themeName);
+        $theme = MiravelFacade::makeTheme($themeName);
         if ($theme->exists()) {
             $resourceName = $this->getTypeAwareName($resourceName);
 
@@ -141,7 +141,7 @@ class ResourceResolver
      */
     protected function resolveFromCurrentTheme(string $resourceName)
     {
-        $theme = Miravel::getCurrentViewParentTheme();
+        $theme = MiravelFacade::getCurrentViewParentTheme();
 
         if ($theme) {
             $resourceName = $this->getTypeAwareName($resourceName);
@@ -159,7 +159,7 @@ class ResourceResolver
     {
         $themeName = $parts[0];
         $viewName  = implode('.', array_slice($parts, 1));
-        $theme     = Miravel::makeTheme($themeName);
+        $theme     = MiravelFacade::makeTheme($themeName);
 
         if ($theme->exists()) {
             return $theme->getResource($viewName);

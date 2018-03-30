@@ -3,7 +3,7 @@
 namespace Miravel;
 
 use Miravel\Factories\ThemeFactory;
-use Miravel;
+use Miravel\Facade as MiravelFacade;
 
 /**
  * Class Theme
@@ -191,7 +191,7 @@ class Theme
             isset($this->config['extends']) &&
             is_string($this->config['extends'])
         ) {
-            $parentTheme = Miravel::makeTheme($this->config['extends']);
+            $parentTheme = MiravelFacade::makeTheme($this->config['extends']);
             $this->setParentTheme($parentTheme);
         }
     }
@@ -438,7 +438,7 @@ class Theme
      */
     protected function lookupTemplateFile(string $relativePath)
     {
-        $extensions = (array)Miravel::getConfig('template_file_extensions');
+        $extensions = (array)MiravelFacade::getConfig('template_file_extensions');
 
         foreach ($extensions as $extension) {
             $completePath = "$relativePath.$extension";

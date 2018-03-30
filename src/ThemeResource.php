@@ -3,7 +3,7 @@
 namespace Miravel;
 
 use SplFileInfo;
-use Miravel;
+use Miravel\Facade as MiravelFacade;
 
 /**
  * Class ThemeResource
@@ -74,7 +74,7 @@ class ThemeResource extends SplFileInfo
      */
     protected function getTemplateFilenameRegex()
     {
-        $extensions = (array)Miravel::getConfig('template_file_extensions');
+        $extensions = (array) MiravelFacade::getConfig('template_file_extensions');
         $extensions = array_map(
             function (string $item) {
                 return '\.' . preg_quote($item, '/');
