@@ -2,6 +2,7 @@
 
 namespace Miravel;
 
+use Miravel\Factories\ThemeFactory;
 use Miravel;
 
 /**
@@ -53,6 +54,10 @@ class Theme
         $this->initPaths();
 
         $this->initConfig();
+
+        $this->register();
+
+        $this->initParentTheme();
     }
 
     /**
@@ -456,5 +461,13 @@ class Theme
                 return $fullpath;
             }
         }
+    }
+
+    /**
+     * Register the theme on the global register
+     */
+    protected function register()
+    {
+        ThemeFactory::register($this->getName(), $this);
     }
 }

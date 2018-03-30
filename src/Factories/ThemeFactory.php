@@ -2,6 +2,7 @@
 
 namespace Miravel\Factories;
 
+use Miravel\Utilities;
 use Miravel\Theme;
 
 /**
@@ -13,7 +14,7 @@ use Miravel\Theme;
  */
 class ThemeFactory
 {
-    const CLASS_FILE_NAME     = 'theme.php';
+    const CLASS_FILE_NAME = 'theme.php';
 
     /**
      * All already instantiated themes are cached, to avoid having to construct
@@ -33,14 +34,22 @@ class ThemeFactory
     public static function make(string $themeName): Theme
     {
         if (!isset(static::$themeRegistry[$themeName])) {
-            $theme = static::instantiate($themeName);
-            static::$themeRegistry[$themeName] = $theme;
-
-            // this must be called AFTER the theme has been registered
-            $theme->initParentTheme();
+            // when a theme is constructed it must be registered on the global registry
+            static::instantiate($themeName);
         }
 
         return static::$themeRegistry[$themeName];
+    }
+
+    /**
+     * Register the theme on the global registry.
+     *
+     * @param string $name  the name of the theme
+     * @param Theme $theme  the theme object
+     */
+    public static function register(string $name, Theme $theme)
+    {
+        static::$themeRegistry[$name] = $theme;
     }
 
     /**
