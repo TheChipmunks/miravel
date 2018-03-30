@@ -40,7 +40,7 @@ return [
         'js'           => 'js',
         'url'          => 'url',
         'prop'         => 'prop',
-        'eprop'        => 'eprop'
+        'eprop'        => 'eprop',
     ],
 
     'tag_templates' => [
@@ -87,8 +87,9 @@ return [
     ],
 
     'paths' => [
-        'vendor' => 'vendor/miravel/resources/themes',
+        'vendor' => 'vendor/miravel/miravel/resources/themes',
         'app'    => 'resources/views/vendor/miravel',
+
         'public' => 'public/miravel',
         'views'  => 'resources/views',
 
