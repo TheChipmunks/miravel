@@ -29,6 +29,11 @@ class Element
     protected $data;
 
     /**
+     * @var string
+     */
+    protected $dataVarName;
+
+    /**
      * @var ThemeResource
      */
     protected $resource;
@@ -42,11 +47,6 @@ class Element
      * @var array
      */
     protected $paths = [];
-
-    /**
-     * @var array
-     */
-    protected $defaultOptions = [];
 
     /**
      * Element constructor.
@@ -75,7 +75,8 @@ class Element
         ThemeResource $resource = null
     ) {
         $this->name     = $name;
-        $this->options  = $options;
+
+        $this->setOptions($options);
 
         $this->initResource($resource);
         $this->initPaths();
@@ -212,10 +213,12 @@ class Element
      */
     protected function prepareViewVars()
     {
+        $dataVarKey = (string)$this->dataVarName;
+
         return [
-            'element' => $this,
-            'data'    => $this->getData(),
-            'options' => $this->options,
+            'element'   => $this,
+            $dataVarKey => $this->getData(),
+            'options'   => $this->getOptions(),
         ];
     }
 

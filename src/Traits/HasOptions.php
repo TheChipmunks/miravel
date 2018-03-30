@@ -2,7 +2,7 @@
 
 namespace Miravel\Traits;
 
-trait hasOptions
+trait HasOptions
 {
     /**
      * @var array
@@ -35,10 +35,7 @@ trait hasOptions
      */
     public function getOptions(): array
     {
-        return array_merge_recursive(
-            (array)$this->defaultOptions,
-            (array)$this->options
-        );
+        return $this->options;
     }
 
     /**
@@ -46,7 +43,11 @@ trait hasOptions
      */
     public function setOptions(array $options)
     {
-        $this->options = $options;
+        if (empty($this->options)) {
+            $this->options = (array)$this->defaultOptions;
+        }
+
+        $this->options = array_merge($this->options, $options);
     }
 
     /**
@@ -58,8 +59,6 @@ trait hasOptions
      */
     public function getOption(string $optionName, $default = null)
     {
-        return $this->options[$optionName] ??
-               $this->defaultOptions[$optionName] ??
-               $default;
+        return array_get($this->options, $optionName, $default);
     }
 }

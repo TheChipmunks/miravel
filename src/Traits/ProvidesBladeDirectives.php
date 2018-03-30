@@ -3,9 +3,9 @@
 namespace Miravel\Traits;
 
 use Miravel\Exceptions\ViewResolvingException;
+use Miravel\Facade as MiravelFacade;
 use Miravel\Utilities;
 use Exception;
-use Miravel;
 use Blade;
 
 /**
@@ -69,10 +69,10 @@ EOF;
      */
     public function directiveProp($expression)
     {
-        $argumentString = $this->getPropDirectiveArgumentString($expression);
+        $expression = Blade::stripParentheses($expression);
 
         $directive = '<?php echo $element->get(%s); ?>';
-        $directive = sprintf($directive, $argumentString);
+        $directive = sprintf($directive, $expression);
 
         return $directive;
     }
@@ -86,10 +86,10 @@ EOF;
      */
     public function directiveEprop($expression)
     {
-        $argumentString = $this->getPropDirectiveArgumentString($expression);
+        $expression = Blade::stripParentheses($expression);
 
         $directive = '<?php echo e($element->get(%s)); ?>';
-        $directive = sprintf($directive, $argumentString);
+        $directive = sprintf($directive, $expression);
 
         return $directive;
     }
@@ -131,11 +131,12 @@ EOF;
         try {
             $path = $this->resolveThemeView($expression);
         } catch (Exception $exception) {
-            Throw new ViewResolvingException([
+            $data = [
                 'directive'   => $forDirective,
-                'callingview' => Miravel::getCurrentView(),
+                'callingview' => MiravelFacade::getCurrentView(),
                 'error'       => $expression->getMessage(),
-            ]);
+            ];
+            MiravelFacade::exception(ViewResolvingException::class, $data, __FILE__, __LINE__);
         }
 
         $directive = <<<'EOF'
@@ -161,11 +162,11 @@ EOF;
      */
     protected function resolveThemeView($expression)
     {
-        if (!$view = Miravel::getCurrentView()) {
+        if (!$view = MiravelFacade::getCurrentView()) {
             throw new Exception('unable to figure out current view');
         }
 
-        if (!$theme = Miravel::getCurrentViewParentTheme()) {
+        if (!$theme = MiravelFacade::getCurrentViewParentTheme()) {
             throw new Exception('unable to figure out current theme');
         }
 
@@ -193,31 +194,5 @@ EOF;
         $expression = Utilities::stripQuotes($expression);
 
         return $expression;
-    }
-
-    /**
-     * @param string $expression
-     *
-     * @return string
-     */
-    protected function getPropDirectiveArgumentString($expression): string
-    {
-        $expression = $this->cleanupExpression($expression);
-
-        // 'whole.part.piece' becomes ['whole', 'part.piece']
-        $elements = Utilities::parseDataAccessExpression($expression);
-
-        // ['whole', 'part.piece'] becomes ['$whole', "'part.piece'"]
-        $elements['varname'] = [sprintf('${"%s"}', $elements['varname'])];
-        if (empty($elements['key'])) {
-            unset($elements['key']);
-        } else {
-            $elements['key'] = "'{$elements['key']}'";
-        }
-
-        // ['$whole', "'part.piece'"] becomes `$whole, 'part.piece'`
-        $argumentString = implode(',', $elements);
-
-        return $argumentString;
     }
 }

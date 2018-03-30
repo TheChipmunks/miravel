@@ -3,6 +3,7 @@
 namespace Miravel\Factories;
 
 use Miravel\Exceptions\LayoutNotFoundException;
+use Miravel\Facade as MiravelFacade;
 use Miravel\Layout;
 
 /**
@@ -35,7 +36,7 @@ class LayoutFactory extends BaseViewFactory
         $resource = static::resolveResource($name);
 
         if (!$resource) {
-            Miravel::exception(LayoutNotFoundException::class, compact('name'), __FILE__, __LINE__);
+            MiravelFacade::exception(LayoutNotFoundException::class, compact('name'), __FILE__, __LINE__);
         }
 
         $layout = new Layout($resource);

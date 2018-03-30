@@ -3,8 +3,8 @@
 namespace Miravel;
 
 use Miravel\Exceptions\MissingConversionMethodException;
+use Miravel\Facade as MiravelFacade;
 use Miravel\Traits\ConvertsData;
-use Miravel;
 
 /**
  * Class ElementData
@@ -61,7 +61,7 @@ class ElementData
         }
 
         // the expected format is missing. The conversion will not be performed.
-        Miravel::warning(sprintf(
+        MiravelFacade::warning(sprintf(
             'ElementData is missing the method "%s" ' .
             'to convert the data into specified format.',
             $method

@@ -2,7 +2,7 @@
 
 namespace Miravel;
 
-use \Illuminate\Support\Facades\Facade as IlluminateFacade;
+use Illuminate\Support\Facades\Facade as IlluminateFacade;
 
 /**
  * Class Facade

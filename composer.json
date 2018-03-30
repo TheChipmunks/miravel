@@ -11,6 +11,8 @@
     ],
     "require": {
         "php": "^7.0",
+    },
+    "require-dev": {
         "laravel/framework": ">=5.0"
     },
     "autoload": {

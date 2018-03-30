@@ -2,8 +2,8 @@
 
 namespace Miravel;
 
+use Miravel\Facade as MiravelFacade;
 use Illuminate\View\View;
-use Miravel;
 
 class Utilities
 {
@@ -30,8 +30,8 @@ class Utilities
 
     public static function findTemplateInDirectory($path)
     {
-        $templateFileName = (string)Miravel::getConfig('template_file_name');
-        $extensions       = (array) Miravel::getConfig('template_file_extensions');
+        $templateFileName = (string)MiravelFacade::getConfig('template_file_name');
+        $extensions       = (array) MiravelFacade::getConfig('template_file_extensions');
 
         foreach ($extensions as $extension) {
             $filename = "$templateFileName.$extension";
@@ -136,7 +136,7 @@ class Utilities
     {
         $basename = basename($path);
 
-        $extensions = (array)Miravel::getConfig('template_file_extensions');
+        $extensions = (array)MiravelFacade::getConfig('template_file_extensions');
 
         // since extensions may contain each other (.blade.php and .php),
         // look for longer ones first
@@ -166,7 +166,7 @@ class Utilities
     public static function pathBelongsToTheme(string $path)
     {
         if ($themeName = Theme::getThemeNameFromViewPath($path)) {
-            return Miravel::makeAndValidateTheme($themeName);
+            return MiravelFacade::makeAndValidateTheme($themeName);
         }
     }
 

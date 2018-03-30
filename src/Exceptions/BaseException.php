@@ -2,8 +2,8 @@
 
 namespace Miravel\Exceptions;
 
-use Exception;
 use Miravel\Utilities;
+use Exception;
 use Throwable;
 
 class BaseException extends Exception
