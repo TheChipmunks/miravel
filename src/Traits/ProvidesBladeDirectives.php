@@ -2,9 +2,9 @@
 
 namespace Miravel\Traits;
 
-use Exception;
 use Miravel\Exceptions\ViewResolvingException;
 use Miravel\Utilities;
+use Exception;
 use Miravel;
 use Blade;
 
@@ -40,21 +40,6 @@ trait ProvidesBladeDirectives
     }
 
     /**
-     * This one is used by BladeCompilerExtendion rather that added as a regular
-     * directive, hence no word "directive" in the name
-     *
-     * @param string $expression  the name of the view to extend
-     *
-     * @returns string            the code that renders the extended view
-     *
-     * @throws ViewResolvingException
-     */
-    public function themeextends(string $expression)
-    {
-        return $this->getViewRenderCode($expression, 'themeextends');
-    }
-
-    /**
      * Implementation of Blade directive @element
      *
      * Shortcut to Miravel::element()
@@ -84,23 +69,45 @@ EOF;
      */
     public function directiveProp($expression)
     {
+        $argumentString = $this->getPropDirectiveArgumentString($expression);
+
         $directive = '<?php echo $element->get(%s); ?>';
-        $directive = sprintf($directive, $expression);
+        $directive = sprintf($directive, $argumentString);
 
         return $directive;
     }
 
+    /**
+     * Render a property of the element data object, escaped by e().
+     *
+     * @param $expression  the expression supplied by the user
+     *
+     * @return string      the code to render the property
+     */
     public function directiveEprop($expression)
     {
+        $argumentString = $this->getPropDirectiveArgumentString($expression);
+
         $directive = '<?php echo e($element->get(%s)); ?>';
-        $directive = sprintf($directive, $expression);
+        $directive = sprintf($directive, $argumentString);
 
         return $directive;
     }
 
-
-
-
+    /**
+     * This one is used by BladeCompilerExtendion rather that added as a regular
+     * directive, hence no word "directive" in the name
+     *
+     * @param string $expression  the name of the view to extend
+     *
+     * @returns string            the code that renders the extended view
+     *
+     * @throws ViewResolvingException
+     */
+    public function themeextends(string $expression)
+    {
+        return $this->getViewRenderCode($expression, 'themeextends');
+    }
 
 
 
@@ -119,8 +126,7 @@ EOF;
      */
     protected function getViewRenderCode(string $expression, string $forDirective): string
     {
-        $expression = Blade::stripParentheses($expression);
-        $expression = Utilities::stripQuotes($expression);
+        $expression = $this->cleanupExpression($expression);
 
         try {
             $path = $this->resolveThemeView($expression);
@@ -172,5 +178,46 @@ EOF;
         }
 
         return $path;
+    }
+
+    /**
+     * Strip parentheses and quotes around an expression
+     *
+     * @param string $expression an expression to clean up
+     *
+     * @return string
+     */
+    protected function cleanupExpression(string $expression)
+    {
+        $expression = Blade::stripParentheses($expression);
+        $expression = Utilities::stripQuotes($expression);
+
+        return $expression;
+    }
+
+    /**
+     * @param string $expression
+     *
+     * @return string
+     */
+    protected function getPropDirectiveArgumentString($expression): string
+    {
+        $expression = $this->cleanupExpression($expression);
+
+        // 'whole.part.piece' becomes ['whole', 'part.piece']
+        $elements = Utilities::parseDataAccessExpression($expression);
+
+        // ['whole', 'part.piece'] becomes ['$whole', "'part.piece'"]
+        $elements['varname'] = [sprintf('${"%s"}', $elements['varname'])];
+        if (empty($elements['key'])) {
+            unset($elements['key']);
+        } else {
+            $elements['key'] = "'{$elements['key']}'";
+        }
+
+        // ['$whole', "'part.piece'"] becomes `$whole, 'part.piece'`
+        $argumentString = implode(',', $elements);
+
+        return $argumentString;
     }
 }

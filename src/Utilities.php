@@ -217,4 +217,14 @@ class Utilities
 
         return $expression;
     }
+
+    public static function parseDataAccessExpression($expression)
+    {
+        $parts = explode('.', $expression);
+
+        $varname = count($parts) ? array_shift($parts) : '';
+        $key     = count($parts) ? implode('.', $parts) : null;
+
+        return compact('varname', 'key');
+    }
 }

@@ -2,9 +2,9 @@
 
 namespace Miravel;
 
-use Miravel\Factories\LoggerFactory;
 use Miravel\Traits\ProvidesBladeDirectives;
 use Miravel\Factories\ElementFactory;
+use Miravel\Factories\LoggerFactory;
 use Miravel\Factories\LayoutFactory;
 use Miravel\Factories\ThemeFactory;
 use Miravel\Traits\Loggable;
