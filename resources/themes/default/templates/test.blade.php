@@ -1,4 +1,4 @@
-@extends('miravel::child.layouts.one-column')
+@extends('miravel::child.layouts.extended')
 
 @section('content')
 

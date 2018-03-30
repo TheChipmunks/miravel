@@ -1,4 +1,4 @@
-@extends('miravel::child.layouts.default')
+@themeextends('layouts.default')
 
 @section('test')
 
