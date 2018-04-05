@@ -1,13 +1,14 @@
-@foreach(Miravel::getConfig('html.meta_tags') as $tag)
-<meta {!! collect($tag)->map(function ($value, $name) { return "$name=\"$value\""; })->implode(' ') !!}>
-@endforeach
+{{-- render common meta tags defined in config/miravel.php, such as viewport, charset and similar --}}
+{{ Miravel::renderMetaTags() }}
 
-<title>{{ $document['title'] or config('app.name') }}</title>
+{{-- include the section with title and meta keywords/description tags --}}
+@themeinclude('partials.title-and-meta')
 
-@isset($document['description'])
-<meta name="description" content="{{ $document['description'] }}">
-@endisset
+{{-- include the links to favicon locations --}}
+@themeinclude('partials.favicon')
 
-@isset($document['keywords'])
-<meta name="keywords" content="{{ $document['keywords'] }}">
-@endisset
+{{-- theme head styles --}}
+@themeinclude('partials.head-styles')
+
+{{-- theme head scripts --}}
+@themeinclude('partials.head-scripts')

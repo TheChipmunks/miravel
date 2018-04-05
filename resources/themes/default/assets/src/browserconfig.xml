@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+    <msapplication>
+        <tile>
+            <square150x150logo src="miravel/default/images/favicon/mstile-150x150.png"/>
+            <TileColor>#8c029c</TileColor>
+        </tile>
+    </msapplication>
+</browserconfig>

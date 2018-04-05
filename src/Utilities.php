@@ -225,4 +225,69 @@ class Utilities
 
         return compact('varname', 'steps');
     }
+
+    public static function renderHtmlAttributes()
+    {
+        $attributes = (array)MiravelFacade::getConfig('html.html_tag_attributes');
+
+        static::renderAttributeList($attributes);
+    }
+
+    public static function renderBodyAttributes()
+    {
+        $attributes = (array)MiravelFacade::getConfig('html.body_tag_attributes');
+
+        static::renderAttributeList($attributes);
+    }
+
+    public static function renderAttributeList(array $attributes)
+    {
+        if (!empty($attributes)) {
+            foreach ($attributes as $name => $value) {
+                if (is_numeric($name)) {
+                    continue;
+                }
+
+                echo sprintf(' %s="%s"', $name, htmlspecialchars($value));
+            }
+        }
+    }
+
+    public static function renderMetaTags()
+    {
+        $tags = (array)MiravelFacade::getConfig('html.meta_tags');
+
+        $compiledTags = [];
+
+        foreach ($tags as $tag) {
+            if (!is_array($tag)) {
+                continue;
+            }
+
+            $compiledAttributes = [];
+
+            foreach ($tag as $attribute => $value) {
+                if (is_numeric($attribute)) {
+                    continue;
+                }
+
+                $compiledAttributes[] = sprintf(
+                    '%s="%s"',
+                    $attribute,
+                    htmlspecialchars($value)
+                );
+            }
+
+            if (!empty($compiledAttributes)) {
+                $compiledTags = sprintf(
+                    '<meta %s>',
+                    implode(' ', $compiledAttributes)
+                );
+            }
+        }
+
+        if (!empty($compiledTags)) {
+            echo implode("\n", $compiledTags);
+        }
+    }
 }

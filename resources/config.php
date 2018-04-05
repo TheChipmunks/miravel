@@ -5,7 +5,7 @@ return [
         'doctype' => 'html',
 
         'html_tag_attributes' => [
-            'class' => 'no-js',
+            //
         ],
 
         'body_tag_attributes' => [
@@ -20,17 +20,17 @@ return [
     ],
 
     'template_file_extensions' => ['php', 'blade.php', 'phtml'],
-
     'template_file_name'       => 'view',
 
     'blade_directive_map' => [
 
-        // the right part is variable, change to your liking
+        // the right side is variable, change to your liking
         // note that the default version is a convention used in third party themes
         // once you change a directive here, you'll have to search and replace its
         // occurrences inside the view files, templates etc.
 
-        // the left part is the default value. Do not change it.
+        // the left side is how Miravel refers to a directive internally.
+        // Do not change it.
 
         'themeinclude' => 'themeinclude',
         'themeextends' => 'themeextends',
@@ -41,6 +41,9 @@ return [
         'url'          => 'url',
         'prop'         => 'prop',
         'eprop'        => 'eprop',
+        'url'          => 'url',
+        'themeurl'     => 'themeurl',
+        'asseturl'     => 'asseturl',
     ],
 
     'tag_templates' => [

@@ -304,4 +304,19 @@ class Miravel
             return $theme;
         }
     }
+
+    public function renderHtmlAttributes()
+    {
+        return Utilities::renderHtmlAttributes();
+    }
+
+    public function renderBodyAttributes()
+    {
+        return Utilities::renderBodyAttributes();
+    }
+
+    public function renderMetaTags()
+    {
+        return Utilities::renderMetaTags();
+    }
 }

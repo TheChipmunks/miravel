@@ -1,0 +1,1 @@
+@themeinclude('partials.google-analytics')
