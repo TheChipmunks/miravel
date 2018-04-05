@@ -3,8 +3,17 @@
 namespace Miravel;
 
 use Illuminate\Support\ServiceProvider;
-use Blade;
-use View;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View;
+
+//commands
+use Miravel\Console\Commands\MiravelGet;
+use Miravel\Console\Commands\MiravelUpdate;
+use Miravel\Console\Commands\MiravelClone;
+use Miravel\Console\Commands\MiravelBuild;
+use Miravel\Console\Commands\MiravelPublish;
+use Miravel\Console\Commands\MiravelUse;
+use Miravel\Console\Commands\MiravelMake;
 
 class ThemeServiceProvider extends ServiceProvider
 {
@@ -24,6 +33,8 @@ class ThemeServiceProvider extends ServiceProvider
         $this->registerBladeExtension();
 
         $this->registerBladeDirectives();
+
+        $this->registerCommands();
 
         $this->loadViewsFrom($this->paths['themes'], 'miravel');
 	}
@@ -102,6 +113,21 @@ class ThemeServiceProvider extends ServiceProvider
                     }
                 );
             }
+        }
+    }
+    
+    protected function registerCommands()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                MiravelGet::class,
+                MiravelUpdate::class,
+                MiravelClone::class,
+                MiravelBuild::class,
+                MiravelPublish::class,
+                MiravelUse::class,
+                MiravelMake::class
+            ]);
         }
     }
 }
