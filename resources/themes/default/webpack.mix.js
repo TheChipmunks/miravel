@@ -2,6 +2,10 @@ let mix = require('laravel-mix');
 
 require('../../../src/js/miravel-mix');
 
+let themepath = path.normalize(path.resolve(__dirname));
+mix.setResourceRoot(path.normalize(themepath));
+mix.setPublicPath(path.normalize(themepath));
+
 mix
     .scripts([
         'assets/vendor/jquery/jquery-3.2.1.slim.js',

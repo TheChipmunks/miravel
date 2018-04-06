@@ -1,10 +1,12 @@
 let mix              = require('laravel-mix/src/index');
 let ComponentFactory = require('laravel-mix/src/components/ComponentFactory');
 new ComponentFactory().installAll();
-let WebpackConfig    = require('laravel-mix/src/builder/WebpackConfig');
 
-mix.setResourceRoot(path.resolve(__dirname));
+let themepath = path.normalize(path.resolve(__dirname));
+Mix.paths.setRootPath(path.normalize(themepath));
 
 require(Mix.paths.mix());
+Mix.dispatch('init', Mix);
 
-module.exports = new WebpackConfig().build();
+let WebpackConfig    = require('laravel-mix/src/builder/WebpackConfig');
+module.exports       = new WebpackConfig().build();

@@ -11,4 +11,4 @@ class Miravel {
 
 }
 
-mix.extend('miravel', new Miravel())
+mix.extend('miravel', new Miravel());
