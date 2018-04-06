@@ -3,7 +3,7 @@ let ComponentFactory = require('laravel-mix/src/components/ComponentFactory');
 new ComponentFactory().installAll();
 let WebpackConfig    = require('laravel-mix/src/builder/WebpackConfig');
 
-mix.Paths.setRootPath(path.resolve(__dirname));
+mix.setResourceRoot(path.resolve(__dirname));
 
 require(Mix.paths.mix());
 
