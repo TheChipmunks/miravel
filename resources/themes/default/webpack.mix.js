@@ -1,11 +1,13 @@
+// require laravel mix and miravel's extension for mix
 let mix = require('laravel-mix');
-
 require('../../../src/js/miravel-mix');
 
+// set mix root paths to theme root
 let themepath = path.normalize(path.resolve(__dirname));
-mix.setResourceRoot(path.normalize(themepath));
-mix.setPublicPath(path.normalize(themepath));
+mix.setResourceRoot(themepath);
+mix.setPublicPath(themepath);
 
+// go
 mix
     .scripts([
         'assets/vendor/jquery/jquery-3.2.1.slim.js',
