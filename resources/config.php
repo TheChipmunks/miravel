@@ -35,26 +35,13 @@ return [
         'themeinclude' => 'themeinclude',
         'themeextends' => 'themeextends',
         'element'      => 'element',
-        'assets'       => 'assets',
-        'css'          => 'css',
-        'js'           => 'js',
-        'url'          => 'url',
         'prop'         => 'prop',
         'eprop'        => 'eprop',
-        'url'          => 'url',
-        'themeurl'     => 'themeurl',
-        'asseturl'     => 'asseturl',
-    ],
-
-    'tag_templates' => [
-        'css'  => '<link href="%url%" rel="stylesheet" type="text/css">',
-        'js'   => '<script src="%url%"></script>',
     ],
 
     'log' => [
 
         'logger_name'       => 'miravel',
-
         'level'             => 'error',
 
         // whether to log miravel messages into a separate file.
@@ -81,6 +68,7 @@ return [
         'permissions'       => 0644,
     ],
 
+    // Where miravel:get will look for themes
     'theme_sources' => [
         'default' => [
             'handler'  => Miravel\ThemeSources\Marketplace::class,
@@ -91,12 +79,12 @@ return [
 
     'paths' => [
         'vendor' => 'vendor/miravel/miravel/resources/themes',
-        'app'    => 'resources/views/vendor/miravel',
+        'app'    => resource_path('views/vendor/miravel'),
 
-        'public' => 'public/miravel',
-        'views'  => 'resources/views',
+        'public' => public_path('miravel'),
+        'views'  => resource_path('views'),
+        'dist'   => storage_path('miravel'),
 
         'web'    => '/miravel',
-    ]
-
+    ],
 ];

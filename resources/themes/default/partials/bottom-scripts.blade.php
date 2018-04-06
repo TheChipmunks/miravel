@@ -1,1 +1,1 @@
-<script src="@asseturl('js.main-script')"></script>
+<script src="{{ mix('scripts.js') }}"></script>

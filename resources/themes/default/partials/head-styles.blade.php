@@ -1,1 +1,1 @@
-<link href="@asseturl('css.main-style')" type="text/css" rel="stylesheet">
+<link href="mix('styles.css')" type="text/css" rel="stylesheet">

@@ -31,8 +31,6 @@ trait ProvidesBladeDirectives
      * @param string $expression  the arguments to the directive.
      *
      * @return string             the resulting php code.
-     *
-     * @throws ViewResolvingException
      */
     public function directiveThemeinclude(string $expression)
     {
@@ -53,14 +51,15 @@ trait ProvidesBladeDirectives
     {
         $expression = Blade::stripParentheses($expression);
 
-        $directive = <<<'EOF'
-<?php echo Miravel::element(%s) ?>
-EOF;
+        $directive = '<?php echo Miravel::element(%s) ?>';
+        $directive = sprintf($directive, $expression);
 
-        return sprintf($directive, $expression);
+        return $directive;
     }
 
     /**
+     * Implementation of Blade directive @prop
+     *
      * Render some property of the element data object.
      *
      * @param $expression  the expression supplied by the user
@@ -78,6 +77,8 @@ EOF;
     }
 
     /**
+     * Implementation of Blade directive @eprop
+     *
      * Render a property of the element data object, escaped by e().
      *
      * @param $expression  the expression supplied by the user
@@ -95,6 +96,8 @@ EOF;
     }
 
     /**
+     * Implementation of Blade directive @themeextends
+     *
      * This one is used by BladeCompilerExtendion rather that added as a regular
      * directive, hence no word "directive" in the name
      *
@@ -109,20 +112,16 @@ EOF;
         return $this->getViewRenderCode($expression, 'themeextends');
     }
 
-
-
     /**
      * Resolve the view name relative to the theme and return the code that will
      * render this view.
      *
-     * @param string $expression the view name relative to the current theme
+     * @param string $expression    the view name relative to the current theme
      *
-     * @param string $forDirective the directive name, so we can make our
+     * @param string $forDirective  the directive name, so we can make our
      *                              Exceptions more informative
      *
      * @return string               the code to insert in the compiled view
-     *
-     * @throws ViewResolvingException
      */
     protected function getViewRenderCode(string $expression, string $forDirective): string
     {
@@ -162,10 +161,7 @@ EOF;
      */
     protected function resolveThemeView($expression)
     {
-        if (!$view = MiravelFacade::getCurrentView()) {
-            throw new Exception('unable to figure out current view');
-        }
-
+        // TODO: move to theme
         if (!$theme = MiravelFacade::getCurrentViewParentTheme()) {
             throw new Exception('unable to figure out current theme');
         }
@@ -188,7 +184,7 @@ EOF;
      *
      * @return string
      */
-    protected function cleanupExpression(string $expression)
+    protected function  cleanupExpression(string $expression)
     {
         $expression = Blade::stripParentheses($expression);
         $expression = Utilities::stripQuotes($expression);

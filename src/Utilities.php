@@ -248,7 +248,7 @@ class Utilities
                     continue;
                 }
 
-                echo sprintf(' %s="%s"', $name, htmlspecialchars($value));
+                echo static::htmlAttr($name, $value, true);
             }
         }
     }
@@ -271,11 +271,7 @@ class Utilities
                     continue;
                 }
 
-                $compiledAttributes[] = sprintf(
-                    '%s="%s"',
-                    $attribute,
-                    htmlspecialchars($value)
-                );
+                $compiledAttributes[] = static::htmlAttr($attribute, $value);
             }
 
             if (!empty($compiledAttributes)) {
@@ -289,5 +285,16 @@ class Utilities
         if (!empty($compiledTags)) {
             echo implode("\n", $compiledTags);
         }
+    }
+
+    protected static function htmlAttr($name, $value, $leadingSpace = false)
+    {
+        $output = sprintf('%s="%s"', $name, htmlspecialchars($value));
+
+        if ($leadingSpace) {
+            $output = " $output";
+        }
+
+        return $output;
     }
 }

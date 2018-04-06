@@ -2,6 +2,8 @@
 
 namespace Miravel;
 
+use Miravel\Exceptions\AssetNotFoundException;
+use Miravel\Exceptions\CurrentThemeException;
 use Miravel\Traits\ProvidesBladeDirectives;
 use Miravel\Factories\ElementFactory;
 use Miravel\Factories\LoggerFactory;
@@ -9,8 +11,6 @@ use Miravel\Factories\LayoutFactory;
 use Miravel\Factories\ThemeFactory;
 use Miravel\Traits\Loggable;
 use Illuminate\View\View;
-
-// TODO: slice functionality into traits
 
 /**
  * Class Miravel
@@ -319,4 +319,5 @@ class Miravel
     {
         return Utilities::renderMetaTags();
     }
+
 }
