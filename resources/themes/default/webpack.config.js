@@ -3,7 +3,7 @@ let ComponentFactory = require('laravel-mix/src/components/ComponentFactory');
 new ComponentFactory().installAll();
 
 let themepath = path.normalize(path.resolve(__dirname));
-Mix.paths.setRootPath(path.normalize(themepath));
+Mix.paths.setRootPath(themepath);
 
 require(Mix.paths.mix());
 Mix.dispatch('init', Mix);
