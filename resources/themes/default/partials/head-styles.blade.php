@@ -1,1 +1,1 @@
-<link href="mix('styles.css')" type="text/css" rel="stylesheet">
+<link href="{{ mix('styles.css') }}" type="text/css" rel="stylesheet">
