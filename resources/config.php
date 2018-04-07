@@ -79,7 +79,7 @@ return [
 
     'paths' => [
         'vendor' => 'vendor/miravel/miravel/resources/themes',
-        'app'    => resource_path('views/vendor/miravel'),
+        'app'    => resource_path('miravel'),
 
         'public' => public_path('miravel'),
         'views'  => resource_path('views'),
