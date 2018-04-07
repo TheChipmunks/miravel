@@ -1,21 +1,20 @@
 <?php
 
 return [
-    'extends' => 'test-parent',
-
     'build' => [
 
         // main css bundle
         'css' => [
             'main-style' => [
                 'src' => [
+                    // theme main js file
                     'assets/src/style.scss',
 
-                    // all elements from this theme and those inherited from parent themes
+                    // all elements from this theme
                     'elements'
                 ],
 
-                // will place the result file to storage/miravel/build/test-child/assets/dist/style.css
+                // will place the result file to storage/miravel/build/test-parent/assets/dist/style.css
                 'dist' => 'assets/dist/style.css',
             ]
         ],
@@ -25,13 +24,14 @@ return [
         'js' => [
             'main-script' => [
                 'src' => [
+                    // theme main js file
                     'assets/src/script.js',
 
-                    // all elements from this theme and those inherited from parent themes
+                    // all elements from this theme
                     'elements'
                 ],
 
-                // will place the result file to storage/miravel/build/test-child/assets/dist/script.js
+                // will place the result file to storage/miravel/build/test-parent/assets/dist/script.js
                 'dist' => 'assets/dist/script.js',
             ]
         ],
@@ -41,10 +41,10 @@ return [
 
     'publish' => [
         // each path is looked up first in
-        // - storage/miravel/build/test-child
+        // - storage/miravel/build/test-parent
 
         // if not found (e.g. user did not run build), then in
-        // - vendor/miravel/miravel/resources/themes/test-child
+        // - vendor/miravel/miravel/resources/themes/test-parent
 
         'assets/dist/style.css' => public_path('styles.css'),
 
