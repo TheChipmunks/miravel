@@ -7,6 +7,9 @@ use Illuminate\View\View;
 
 class Utilities
 {
+    
+    protected static $themeDirPaths;
+    
     /**
      * @param string $path
      *
@@ -165,7 +168,7 @@ class Utilities
 
     public static function pathBelongsToTheme(string $path)
     {
-        if ($themeName = Theme::getThemeNameFromViewPath($path)) {
+        if ($themeName = static::getThemeNameFromViewPath($path)) {
             return MiravelFacade::makeAndValidateTheme($themeName);
         }
     }
@@ -296,5 +299,82 @@ class Utilities
         }
 
         return $output;
+    }
+    
+    /**
+     * Get the directories where the files belonging to this theme might be
+     * located. Normally, there are two paths:
+     * - in the application (resources/views/vendor/miravel)
+     * - in the vendor directory (vendor/miravel/miravel/resources/themes)
+     *
+     * First, a theme file is sought in the app scope and if missing,
+     * in the vendor directory.
+     *
+     * This function returns the paths without the theme name appended yet.
+     *
+     * @return array
+     */
+    public static function getResourceLookupPaths(): array
+    {
+        if (is_null(static::$themeDirPaths)) {
+            $hints  = app()->make('view.finder')->getHints();
+            $result = [];
+            
+            if (isset($hints['miravel']) && is_array($hints['miravel'])) {
+                foreach ($hints['miravel'] as $hint) {
+                    $realpath = realpath($hint);
+                    
+                    if (Utilities::isResourceViewPath($realpath)) {
+                        $result['app'] = $realpath;
+                    } elseif (Utilities::isVendorPackagePath($realpath)) {
+                        $result['vendor'] = $realpath;
+                    }
+                }
+            }
+            
+            // make sure app is always first
+            ksort($result);
+            
+            static::$themeDirPaths = $result;
+        }
+        
+        return static::$themeDirPaths;
+    }
+    
+    
+    /**
+     * If a view path contains a theme name, return it.
+     *
+     * @param string $viewPath  the path to the view file or directory.
+     *
+     * @return string|void
+     */
+    public static function getThemeNameFromViewPath(string $viewPath)
+    {
+        // TODO: move to Utilities
+        
+        $lookupPaths = static::getResourceLookupPaths();
+        
+        foreach ($lookupPaths as $lookupPath) {
+            $lookupPath = realpath($lookupPath);
+            if (0 !== strpos($viewPath, $lookupPath)) {
+                continue;
+            }
+            
+            $relative = substr($viewPath, strlen($lookupPath));
+            $relative = trim($relative, DIRECTORY_SEPARATOR);
+            $segments = explode(DIRECTORY_SEPARATOR, $relative);
+            if (count($segments) <= 1) {
+                continue;
+            }
+            
+            return $segments[0];
+        }
+    }
+    
+    
+    public static function getDistPath()
+    {
+        return MiravelFacade::getConfig('paths.dist');
     }
 }

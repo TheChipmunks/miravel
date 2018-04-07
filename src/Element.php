@@ -5,7 +5,8 @@ namespace Miravel;
 use Miravel\Traits\AccessesDataProperties;
 use Miravel\Traits\ExpectsDataFormats;
 use Miravel\Traits\HasOptions;
-use View;
+use Illuminate\Support\Facades\View;
+
 
 /**
  * Class Element

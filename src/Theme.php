@@ -38,9 +38,6 @@ class Theme
      */
     protected $parentTheme;
 
-    // Cached paths where files related to this theme will be searched, in order
-    // or appearance on the list.
-    protected static $themeDirPaths;
 
     /**
      * Theme constructor.
@@ -65,7 +62,7 @@ class Theme
      */
     protected function initPaths()
     {
-        $paths = static::getThemeDirPaths();
+        $paths = Utilities::getResourceLookupPaths();
 
         foreach ($paths as $pathname => $path) {
             $path = implode(DIRECTORY_SEPARATOR, [$path, $this->name]);
@@ -95,7 +92,7 @@ class Theme
 
         $this->config = $config;
     }
-
+    
     /**
      * @param string $pathname
      *
@@ -110,75 +107,6 @@ class Theme
             [];
     }
 
-    /**
-     * Get the directories where the files belonging to this theme might be
-     * located. Normally, there are two paths:
-     * - in the application (resources/views/vendor/miravel)
-     * - in the vendor directory (vendor/miravel/miravel/resources/themes)
-     *
-     * First, a theme file is sought in the app scope and if missing,
-     * in the vendor directory.
-     *
-     * This function returns the paths without the theme name appended yet.
-     *
-     * @return array
-     */
-    public static function getThemeDirPaths(): array
-    {
-        if (is_null(static::$themeDirPaths)) {
-            $hints  = app()->make('view.finder')->getHints();
-            $result = [];
-
-            if (isset($hints['miravel']) && is_array($hints['miravel'])) {
-                foreach ($hints['miravel'] as $hint) {
-                    $realpath = realpath($hint);
-
-                    if (Utilities::isResourceViewPath($realpath)) {
-                        $result['app'] = $realpath;
-                    } elseif (Utilities::isVendorPackagePath($realpath)) {
-                        $result['vendor'] = $realpath;
-                    }
-                }
-            }
-
-            // make sure app is always first
-            ksort($result);
-
-            static::$themeDirPaths = $result;
-        }
-
-        return static::$themeDirPaths;
-    }
-
-    /**
-     * If a view path contains a theme name, return it.
-     *
-     * @param string $viewPath  the path to the view file or directory.
-     *
-     * @return string|void
-     */
-    public static function getThemeNameFromViewPath(string $viewPath)
-    {
-        // TODO: move to Utilities
-
-        $lookupPaths = static::getThemeDirPaths();
-
-        foreach ($lookupPaths as $lookupPath) {
-            $lookupPath = realpath($lookupPath);
-            if (0 !== strpos($viewPath, $lookupPath)) {
-                continue;
-            }
-
-            $relative = substr($viewPath, strlen($lookupPath));
-            $relative = trim($relative, DIRECTORY_SEPARATOR);
-            $segments = explode(DIRECTORY_SEPARATOR, $relative);
-            if (count($segments) <= 1) {
-                continue;
-            }
-
-            return $segments[0];
-        }
-    }
 
     /**
      * Initialize the parent theme.
@@ -272,7 +200,6 @@ class Theme
     public function setParentTheme(Theme $parentTheme = null): Theme
     {
         $this->parentTheme = $parentTheme;
-        $this->mergeParentThemeConfig();
 
         return $this;
     }
@@ -287,22 +214,6 @@ class Theme
         return !empty($this->paths);
     }
 
-    /**
-     * Only missing values from parent config will be appended.
-     * Otherwise, current (child) theme config values take precedence.
-     *
-     * @return void
-     */
-    protected function mergeParentThemeConfig()
-    {
-        if (!$this->parentTheme) {
-            return;
-        }
-
-        $parentConfig = $this->parentTheme->getConfig();
-
-        $this->config += $parentConfig;
-    }
 
     /**
      * @param string $filename
@@ -396,7 +307,7 @@ class Theme
         if (empty($name)) {
             return;
         }
-
+        
         // assume a static / source file first
         if ($path = $this->lookupFile($name)) {
             return new ThemeResource($path);
@@ -469,5 +380,13 @@ class Theme
     protected function register()
     {
         ThemeFactory::register($this->getName(), $this);
+    }
+    
+    /**
+     * Get Type resurse
+     */
+    protected function getTypeResurceByName($name){
+        $Data = explode('.', $name);
+        return !empty($Data) ? current($Data) : null;
     }
 }

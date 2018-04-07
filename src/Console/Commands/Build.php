@@ -3,6 +3,7 @@
 namespace Miravel\Console\Commands;
 
 use Illuminate\Console\Command;
+use Miravel\Build;
 
 class MiravelBuild extends Command
 {
@@ -11,7 +12,7 @@ class MiravelBuild extends Command
      *
      * @var string
      */
-    protected $signature = 'miravel:build';
+    protected $signature = 'miravel:build {name}';
     
     /**
      * The console command description.
@@ -19,6 +20,7 @@ class MiravelBuild extends Command
      * @var string
      */
     protected $description = 'Miravel Build';
+    
     
     /**
      * Create a new command instance.
@@ -37,6 +39,7 @@ class MiravelBuild extends Command
      */
     public function handle()
     {
-        //
+        $Name = $this->argument('name');
+        $Build = new Build($Name);
     }
 }
