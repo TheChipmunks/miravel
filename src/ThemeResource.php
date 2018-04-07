@@ -70,9 +70,7 @@ class ThemeResource extends SplFileInfo
             // this resource is represented by a single file. If the file name
             // is the same as the requested class file name, just return the
             // full path to it.
-            $filename = $this->getFilename();
-
-            if ($filename == $classFileName) {
+            if ($this->getFilename() == $classFileName) {
                 return $this->getRealPath();
             }
         } else {
