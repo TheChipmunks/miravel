@@ -421,7 +421,7 @@ class Theme
      *
      * @return string|void
      */
-    protected function lookupFile(string $relativePath)
+    public function lookupFile(string $relativePath)
     {
         foreach ($this->paths as $pathname => $path) {
             $fullpath = implode(DIRECTORY_SEPARATOR, [$path, $relativePath]);
@@ -436,7 +436,7 @@ class Theme
      *
      * @return string|void
      */
-    protected function lookupTemplateFile(string $relativePath)
+    public function lookupTemplateFile(string $relativePath)
     {
         $extensions = (array)MiravelFacade::getConfig('template_file_extensions');
 
@@ -453,7 +453,7 @@ class Theme
      *
      * @return string|void
      */
-    protected function lookupDirectory(string $relativePath)
+    public function lookupDirectory(string $relativePath)
     {
         foreach ($this->paths as $pathname => $path) {
             $fullpath = implode(DIRECTORY_SEPARATOR, [$path, $relativePath]);
