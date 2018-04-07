@@ -44,12 +44,19 @@ class ThemeResource extends SplFileInfo
             return $this->getRealPath();
         }
 
-        if ($this->isDir()) {
-            // ask theme to find the view file
-            if ($relativePath = $this->getRelativeViewPath()) {
-                return $this->getTheme()->lookupTemplateFile($relativePath);
-            }
+        if (!$this->isDir()) {
+            return;
         }
+
+        if (!$relativePath = $this->getRelativeViewPath()) {
+            return;
+        }
+
+        if (!$resource = $this->getTheme()->getResource($relativePath)) {
+            return;
+        }
+
+        return $resource->getRealPath();
     }
 
     /**
@@ -72,9 +79,15 @@ class ThemeResource extends SplFileInfo
             // this resource is represented by a directory. Try to find the
             // requested class filename in it. We do it by asking the theme to
             // look up the entire hierarchy tree.
-            if ($relativePath = $this->getRelativeClassPath($classFileName)) {
-                return $this->getTheme()->lookupFile($relativePath);
+            if (!$relativePath = $this->getRelativeClassPath($classFileName)) {
+                return;
             }
+
+            if (!$resource = $this->getTheme()->getResource($relativePath)) {
+                return;
+            }
+
+            return $resource->getRealPath();
         }
     }
 
