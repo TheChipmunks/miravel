@@ -101,7 +101,8 @@ class ThemeFactory
      */
     protected static function getCustomClassName(Theme $theme)
     {
-        $classFilePath = $theme->getResource(static::CLASS_FILE_NAME);
+        $classFileName = static::getClassFileName();
+        $classFilePath = $theme->getResource($classFileName);
 
         // see if class file exists
         if (!$classFilePath || !is_file($classFilePath)) {
