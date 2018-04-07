@@ -1,3 +1,3 @@
-<div class="element05">
+<div class="element element05">
     Element 05 from child theme (vendor)
 </div>

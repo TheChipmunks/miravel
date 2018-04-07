@@ -1,0 +1,11 @@
+$padding = 20px;
+$body-font-family = 'sans-serif';
+
+body {
+    font-family: $body-font-family;
+}
+
+.element {
+    padding: $padding;
+}
+

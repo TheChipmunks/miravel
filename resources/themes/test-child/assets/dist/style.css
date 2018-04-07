@@ -1,0 +1,28 @@
+body {
+    font-family: sans-serif;
+}
+
+.element {
+    padding: 20px;
+}
+
+.element01 {
+  color: green;
+}
+
+.element02 {
+  color: fuchsia;
+}
+
+.element03 {
+  color: blue;
+  font-weight: 900;
+}
+
+.element04 {
+  color: orangered;
+}
+
+.element05 {
+  color: #600708;
+}
