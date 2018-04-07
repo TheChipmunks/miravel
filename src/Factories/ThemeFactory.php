@@ -2,6 +2,7 @@
 
 namespace Miravel\Factories;
 
+use Miravel\Facade as MiravelFacade;
 use Miravel\Utilities;
 use Miravel\Theme;
 
@@ -14,8 +15,6 @@ use Miravel\Theme;
  */
 class ThemeFactory
 {
-    const CLASS_FILE_NAME = 'theme.php';
-
     /**
      * All already instantiated themes are cached, to avoid having to construct
      * them twice.
@@ -125,5 +124,10 @@ class ThemeFactory
         }
 
         return $className;
+    }
+
+    protected static function getClassFileName()
+    {
+        return MiravelFacade::getConfig('class_file_name');
     }
 }
