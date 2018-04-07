@@ -275,7 +275,7 @@ class Utilities
             }
 
             if (!empty($compiledAttributes)) {
-                $compiledTags = sprintf(
+                $compiledTags[] = sprintf(
                     '<meta %s>',
                     implode(' ', $compiledAttributes)
                 );
