@@ -17,7 +17,6 @@ use Miravel\Element;
  */
 class ElementFactory extends BaseViewFactory
 {
-    const CLASS_FILE_NAME       = 'element.php';
     const DEFAULT_ELEMENT_CLASS = '\Miravel\Element';
 
     /**
@@ -69,7 +68,8 @@ class ElementFactory extends BaseViewFactory
      */
     protected static function getCustomClassName(ThemeResource $resource)
     {
-        $classFilePath = $resource->getClassFile(static::CLASS_FILE_NAME);
+        $classFileName = static::getClassFileName();
+        $classFilePath = $resource->getClassFile($classFileName);
 
         // see if class file exists in directory
         if (!$classFilePath) {
@@ -92,6 +92,11 @@ class ElementFactory extends BaseViewFactory
         }
 
         return $className;
+    }
+
+    protected static function getClassFileName()
+    {
+        return MiravelFacade::getConfig('class_file_name');
     }
 }
 

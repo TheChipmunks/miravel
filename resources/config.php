@@ -21,6 +21,7 @@ return [
 
     'template_file_extensions' => ['php', 'blade.php', 'phtml'],
     'template_file_name'       => 'view',
+    'class_file_name'          => 'class',
 
     'blade_directive_map' => [
 
