@@ -139,6 +139,11 @@ class Element
         }
     }
 
+    protected static function isFullyQualifiedName($name)
+    {
+        return (false !== strpos($name, '.'));
+    }
+
     /**
      * Set the data to populate this element. Data will be stored in a special
      * ElementData object that can manipulate it before rendering.
