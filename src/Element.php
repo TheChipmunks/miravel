@@ -113,9 +113,9 @@ class Element
     {
         if (static::isFullyQualifiedName($name)) {
             $this->name = $name;
+        } else {
+            $this->name = $this->prependThemePrefix($name);
         }
-
-        $this->name = $this->prependThemePrefixToName($name);
     }
 
     protected function initSignature()
@@ -139,7 +139,12 @@ class Element
         }
     }
 
-    protected static function isFullyQualifiedName($name)
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    protected static function isFullyQualifiedName(string $name)
     {
         return (false !== strpos($name, '.'));
     }
