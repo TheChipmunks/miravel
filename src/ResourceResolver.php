@@ -105,6 +105,12 @@ class ResourceResolver
 
         // 'elementname' or 'layoutname' or 'templatename'
         if (count($parts) == 1) {
+            // if this is an element called by another element, try resolving it
+            // from the parent element's theme
+            if ($resource = $this->tryResolveElementFromTopLevel($parts[0])) {
+                return $resource;
+            }
+
             return $this->resolveFromCurrentTheme($parts[0]);
         }
 
@@ -177,5 +183,22 @@ class ResourceResolver
     protected function getTypeAwareName($name)
     {
         return sprintf('%s.%s', $this->viewType, $name);
+    }
+
+    protected function tryResolveElementFromTopLevel($name)
+    {
+        if ('elements' !== $this->viewType) {
+            return;
+        }
+
+        if (!$topLevel = MiravelFacade::getTopLevelRenderingElement()) {
+            return;
+        }
+
+        if (!$themeName = substr($topLevel, 0, strpos($topLevel, '.'))) {
+            return;
+        }
+
+        return $this->resolveFromTheme($themeName, $name);
     }
 }

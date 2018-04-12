@@ -50,6 +50,8 @@ class Element
      */
     protected $paths = [];
 
+    protected $signature;
+
     /**
      * Element constructor.
      *
@@ -76,16 +78,13 @@ class Element
         array $options = [],
         ThemeResource $resource = null
     ) {
-        $this->name = $name;
-
         $this->setOptions($options);
-
         $this->initResource($resource);
+        $this->initName($name);
         $this->initPaths();
         $this->setData($data);
-
         $this->setupPropertyMap($options);
-
+        $this->initSignature();
         $this->setExpectations();
     }
 
@@ -103,6 +102,25 @@ class Element
         if ($this->resource->isDir()) {
             $this->paths['directory'] = $this->resource->getPathname();
         }
+    }
+
+    /**
+     * If we were given an incomplete element name, prepend the theme name to it.
+     *
+     * @param $name
+     */
+    protected function initName($name)
+    {
+        if (static::isFullyQualifiedName($name)) {
+            $this->name = $name;
+        }
+
+        $this->name = $this->prependThemePrefixToName($name);
+    }
+
+    protected function initSignature()
+    {
+        $this->signature = static::makeSignature();
     }
 
     /**
@@ -239,11 +257,6 @@ class Element
         return $this->name;
     }
 
-    public function getFullyQualifiedName()
-    {
-        return implode('.', [$this->getTheme()->getName(), $this->getName()]);
-    }
-
     /**
      * @return null|Theme
      */
@@ -258,5 +271,27 @@ class Element
     public function setTheme(Theme $theme)
     {
         $this->theme = $theme;
+    }
+
+    public function getSignature()
+    {
+        return $this->signature;
+    }
+
+    protected function prependThemePrefix(string $name)
+    {
+        $themeName = $this->getTheme()->getName();
+
+        return implode('.', [$themeName, $name]);
+    }
+
+    public static function makeSignature()
+    {
+        return str_random(32);
+    }
+
+    public function getSignedName()
+    {
+        return implode('.', [$this->getName(), $this->getSignature()]);
     }
 }

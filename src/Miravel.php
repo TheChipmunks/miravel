@@ -285,6 +285,11 @@ class Miravel
         }
     }
 
+    public function getTopLevelRenderingElement()
+    {
+        return $this->topLevelElementName;
+    }
+
     /**
      * Get the current view being rendered.
      *

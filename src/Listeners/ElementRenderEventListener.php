@@ -21,15 +21,15 @@ class ElementRenderEventListener
 
     protected function handleStartElementRender(StartElementRenderEvent $event)
     {
-        $fqn = $event->element->getFullyQualifiedName();
+        $signedName = $event->element->getSignedName();
 
-        MiravelFacade::registerTopLevelRenderingElement($fqn);
+        MiravelFacade::registerTopLevelRenderingElement($signedName);
     }
 
     protected function handleFinishElementRender(FinishElementRenderEvent $event)
     {
-        $fqn = $event->element->getFullyQualifiedName();
+        $signedName = $event->element->getSignedName();
 
-        MiravelFacade::unregisterTopLevelRenderingElement($fqn);
+        MiravelFacade::unregisterTopLevelRenderingElement($signedName);
     }
 }
