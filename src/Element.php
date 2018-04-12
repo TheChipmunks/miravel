@@ -76,7 +76,7 @@ class Element
         array $options = [],
         ThemeResource $resource = null
     ) {
-        $this->name     = $name;
+        $this->name = $name;
 
         $this->setOptions($options);
 

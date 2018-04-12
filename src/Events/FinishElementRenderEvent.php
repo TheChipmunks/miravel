@@ -2,6 +2,8 @@
 
 namespace Miravel\Events;
 
+use Miravel\Element;
+
 class FinishElementRenderEvent
 {
     /**
