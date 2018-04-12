@@ -2,6 +2,8 @@
 
 namespace Miravel;
 
+use Miravel\Events\FinishElementRenderEvent;
+use Miravel\Events\StartElementRenderEvent;
 use Miravel\Traits\AccessesDataProperties;
 use Miravel\Traits\ExpectsDataFormats;
 use Illuminate\Support\Facades\View;
@@ -184,16 +186,21 @@ class Element
      */
     public function render(): string
     {
+        event(new StartElementRenderEvent($this));
+
         $viewPath = $this->getViewPath();
         $viewVars = $this->prepareViewVars();
 
-        $view = View::file($viewPath, $viewVars);
-
-        if ($view) {
-            return $view->render();
+        if ($viewPath) {
+            $view = View::file($viewPath, $viewVars);
+            $output = $view ? $view->render() : '';
+        } else {
+            $output = '';
         }
 
-        return '';
+        event(new FinishElementRenderEvent($this));
+
+        return $output;
     }
 
     /**
