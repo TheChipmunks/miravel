@@ -4,7 +4,7 @@ namespace Miravel\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class MiravelMake extends Command
+class MakeCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -12,14 +12,14 @@ class MiravelMake extends Command
      * @var string
      */
     protected $signature = 'miravel:make';
-    
+
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Create a blank theme';
-    
+
     /**
      * Create a new command instance.
      *
@@ -29,7 +29,7 @@ class MiravelMake extends Command
     {
         parent::__construct();
     }
-    
+
     /**
      * Execute the console command.
      *

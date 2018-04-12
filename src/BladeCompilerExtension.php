@@ -4,7 +4,6 @@ namespace Miravel;
 
 use Miravel\Traits\ProvidesBladeDirectives;
 use Miravel\Facade as MiravelFacade;
-use Blade;
 
 /**
  * Class BladeCompilerExtension

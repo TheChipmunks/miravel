@@ -7,13 +7,13 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 
 //commands
-use Miravel\Console\Commands\MiravelGet;
-use Miravel\Console\Commands\MiravelUpdate;
-use Miravel\Console\Commands\MiravelClone;
-use Miravel\Console\Commands\MiravelBuild;
-use Miravel\Console\Commands\MiravelPublish;
-use Miravel\Console\Commands\MiravelUse;
-use Miravel\Console\Commands\MiravelMake;
+use Miravel\Console\Commands\PublishCommand;
+use Miravel\Console\Commands\UpdateCommand;
+use Miravel\Console\Commands\CloneCommand;
+use Miravel\Console\Commands\BuildCommand;
+use Miravel\Console\Commands\MakeCommand;
+use Miravel\Console\Commands\GetCommand;
+use Miravel\Console\Commands\UseCommand;
 
 class ThemeServiceProvider extends ServiceProvider
 {
@@ -115,18 +115,18 @@ class ThemeServiceProvider extends ServiceProvider
             }
         }
     }
-    
+
     protected function registerCommands()
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                MiravelGet::class,
-                MiravelUpdate::class,
-                MiravelClone::class,
-                MiravelBuild::class,
-                MiravelPublish::class,
-                MiravelUse::class,
-                MiravelMake::class
+                GetCommand::class,
+                UpdateCommand::class,
+                CloneCommand::class,
+                BuildCommand::class,
+                PublishCommand::class,
+                UseCommand::class,
+                MakeCommand::class
             ]);
         }
     }

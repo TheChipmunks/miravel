@@ -3,7 +3,6 @@
 namespace Miravel;
 
 use Illuminate\View\FileViewFinder as LaravelFileViewFinder;
-
 use Miravel\Facade as MiravelFacade;
 
 /**

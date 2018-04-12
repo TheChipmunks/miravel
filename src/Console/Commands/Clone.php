@@ -4,7 +4,7 @@ namespace Miravel\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class MiravelClone extends Command
+class CloneCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -12,14 +12,14 @@ class MiravelClone extends Command
      * @var string
      */
     protected $signature = 'miravel:clone';
-    
+
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Override vendor\'s theme or its part';
-    
+
     /**
      * Create a new command instance.
      *
@@ -29,7 +29,7 @@ class MiravelClone extends Command
     {
         parent::__construct();
     }
-    
+
     /**
      * Execute the console command.
      *

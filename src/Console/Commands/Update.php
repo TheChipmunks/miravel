@@ -4,7 +4,7 @@ namespace Miravel\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class MiravelUpdate extends Command
+class UpdateCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -12,14 +12,14 @@ class MiravelUpdate extends Command
      * @var string
      */
     protected $signature = 'miravel:update';
-    
+
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Update a theme';
-    
+
     /**
      * Create a new command instance.
      *
@@ -29,7 +29,7 @@ class MiravelUpdate extends Command
     {
         parent::__construct();
     }
-    
+
     /**
      * Execute the console command.
      *

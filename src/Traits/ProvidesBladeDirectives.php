@@ -3,10 +3,10 @@
 namespace Miravel\Traits;
 
 use Miravel\Exceptions\ViewResolvingException;
+use Illuminate\Support\Facades\Blade;
 use Miravel\Facade as MiravelFacade;
 use Miravel\Utilities;
 use Exception;
-use Blade;
 
 /**
  * Trait ProvidesBladeDirectives

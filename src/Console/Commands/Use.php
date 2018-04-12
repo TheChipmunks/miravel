@@ -4,7 +4,7 @@ namespace Miravel\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class MiravelUse extends Command
+class UseCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -12,14 +12,14 @@ class MiravelUse extends Command
      * @var string
      */
     protected $signature = 'miravel:use';
-    
+
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Use a template';
-    
+    protected $description = 'Use a template in the application';
+
     /**
      * Create a new command instance.
      *
@@ -29,7 +29,7 @@ class MiravelUse extends Command
     {
         parent::__construct();
     }
-    
+
     /**
      * Execute the console command.
      *

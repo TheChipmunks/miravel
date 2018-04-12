@@ -4,7 +4,7 @@ namespace Miravel\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class MiravelGet extends Command
+class GetCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -12,14 +12,14 @@ class MiravelGet extends Command
      * @var string
      */
     protected $signature = 'miravel:get';
-    
+
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Download a theme';
-    
+
     /**
      * Create a new command instance.
      *
@@ -29,7 +29,7 @@ class MiravelGet extends Command
     {
         parent::__construct();
     }
-    
+
     /**
      * Execute the console command.
      *

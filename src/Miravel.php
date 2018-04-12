@@ -2,8 +2,6 @@
 
 namespace Miravel;
 
-use Miravel\Exceptions\AssetNotFoundException;
-use Miravel\Exceptions\CurrentThemeException;
 use Miravel\Traits\ProvidesBladeDirectives;
 use Miravel\Factories\ElementFactory;
 use Miravel\Factories\LoggerFactory;

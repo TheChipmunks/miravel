@@ -4,7 +4,7 @@ namespace Miravel\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class MiravelBuild extends Command
+class BuildCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -12,14 +12,14 @@ class MiravelBuild extends Command
      * @var string
      */
     protected $signature = 'miravel:build';
-    
+
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Miravel Build';
-    
+    protected $description = 'Build theme assets from sources';
+
     /**
      * Create a new command instance.
      *
@@ -29,7 +29,7 @@ class MiravelBuild extends Command
     {
         parent::__construct();
     }
-    
+
     /**
      * Execute the console command.
      *

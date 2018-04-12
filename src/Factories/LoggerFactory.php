@@ -6,10 +6,10 @@ use Monolog\Processor\PsrLogMessageProcessor;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Logger as MonologLogger;
+use Illuminate\Support\Facades\Log;
 use Monolog\Handler\StreamHandler;
 use Psr\Log\LoggerInterface;
 use Miravel\Utilities;
-use Log;
 
 /**
  * Class LoggerFactory

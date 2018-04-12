@@ -4,7 +4,7 @@ namespace Miravel\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class MiravelPublish extends Command
+class PublishCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -12,14 +12,14 @@ class MiravelPublish extends Command
      * @var string
      */
     protected $signature = 'miravel:publish';
-    
+
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Copy theme assets to public directory';
-    
+
     /**
      * Create a new command instance.
      *
@@ -29,7 +29,7 @@ class MiravelPublish extends Command
     {
         parent::__construct();
     }
-    
+
     /**
      * Execute the console command.
      *
