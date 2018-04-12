@@ -232,6 +232,11 @@ class Element
         return $this->name;
     }
 
+    public function getFullyQualifiedName()
+    {
+        return implode('.', [$this->getTheme()->getName(), $this->getName()]);
+    }
+
     /**
      * @return null|Theme
      */

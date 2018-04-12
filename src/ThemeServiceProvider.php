@@ -2,9 +2,16 @@
 
 namespace Miravel;
 
+// general
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
+
+// events
+use Miravel\Listeners\ElementRenderEventListener;
+use Miravel\Events\FinishElementRenderEvent;
+use Miravel\Events\StartElementRenderEvent;
 
 //commands
 use Miravel\Console\Commands\PublishCommand;
@@ -14,6 +21,7 @@ use Miravel\Console\Commands\BuildCommand;
 use Miravel\Console\Commands\MakeCommand;
 use Miravel\Console\Commands\GetCommand;
 use Miravel\Console\Commands\UseCommand;
+
 
 class ThemeServiceProvider extends ServiceProvider
 {
@@ -35,6 +43,8 @@ class ThemeServiceProvider extends ServiceProvider
         $this->registerBladeDirectives();
 
         $this->registerCommands();
+
+        $this->registerEvents();
 
         $this->loadViewsFrom($this->paths['themes'], 'miravel');
 	}
@@ -129,5 +139,21 @@ class ThemeServiceProvider extends ServiceProvider
                 MakeCommand::class
             ]);
         }
+    }
+
+    protected function registerEvents()
+    {
+        // ElementRenderEventListener will listen to both startRender and
+        // finishRender events
+
+        Event::listen(
+            StartElementRenderEvent::class,
+            ElementRenderEventListener::class
+        );
+
+        Event::listen(
+            FinishElementRenderEvent::class,
+            ElementRenderEventListener::class
+        );
     }
 }

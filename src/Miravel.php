@@ -37,6 +37,11 @@ class Miravel
     protected $currentView;
 
     /**
+     * @var string
+     */
+    protected $topLevelElementName;
+
+    /**
      * Miravel constructor.
      */
     public function __construct()
@@ -245,7 +250,7 @@ class Miravel
      * about the current view being rendered and current layout being used.
      *
      * This function is registered as a composer at the beginning of application
-     * pipeline.
+     * pipeline (by ThemeServiceProvider).
      *
      * @param View $view  the view being rendered.
      *
@@ -262,6 +267,21 @@ class Miravel
             $layout = $this->makeLayout($viewName)
         ) {
             $this->setLayout($layout);
+        }
+    }
+
+
+    public function registerTopLevelRenderingElement(string $elementName)
+    {
+        if (!$this->topLevelElementName) {
+            $this->topLevelElementName = $elementName;
+        }
+    }
+
+    public function unregisterTopLevelRenderingElement(string $elementName)
+    {
+        if ($this->topLevelElementName == $elementName) {
+            $this->topLevelElementName = null;
         }
     }
 
