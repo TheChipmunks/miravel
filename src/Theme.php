@@ -442,9 +442,12 @@ class Theme
                 return $fullpath;
             }
 
+            // try the extensions
+            $base = $fullpath;
+
             if (!empty($extensions)) {
                 foreach ($extensions as $ext) {
-                    $fullpath .= ".$ext";
+                    $fullpath = "$base.$ext";
                     if (file_exists($fullpath)) {
                         return $fullpath;
                     }
