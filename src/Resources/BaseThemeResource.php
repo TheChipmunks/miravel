@@ -109,22 +109,6 @@ abstract class BaseThemeResource extends SplFileInfo
         return $this->callingTheme;
     }
 
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     */
-    protected function setType(string $type)
-    {
-        $this->type = $type;
-    }
-
     abstract public function getViewFile();
 
     abstract public function getClassFile();
