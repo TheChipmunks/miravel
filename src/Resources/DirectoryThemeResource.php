@@ -11,7 +11,7 @@ class DirectoryThemeResource extends BaseThemeResource
      */
     public function getClassFile()
     {
-        $relativePath = $this->getRelativePathView();
+        $relativePath = $this->getRelativePathClass();
         $extensions   = MiravelFacade::getConfig('template_file_extensions');
 
         $resource = $this->getCallingTheme()->getResource(
