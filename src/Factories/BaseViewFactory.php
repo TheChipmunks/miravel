@@ -2,8 +2,8 @@
 
 namespace Miravel\Factories;
 
+use Miravel\Resources\BaseThemeResource;
 use Miravel\ResourceResolver;
-use Miravel\ThemeResource;
 
 /**
  * Class BaseViewFactory
@@ -27,7 +27,7 @@ abstract class BaseViewFactory
      *
      * @param string $name              the view name.
      *
-     * @return null|ThemeResource|void  the resource containing path to file or
+     * @return null|BaseThemeResource|void  the resource containing path to file or
      *                                  directory.
      */
     protected static function resolveResource(string $name)

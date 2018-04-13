@@ -37,7 +37,7 @@ class Element
     protected $dataVarName = 'data';
 
     /**
-     * @var ThemeResource
+     * @var BaseThemeResource
      */
     protected $resource;
 
@@ -56,53 +56,33 @@ class Element
     /**
      * Element constructor.
      *
-     * @param string $name                  the name of the element, either
-     *                                      absolute like
-     *                                      'miravel::theme.elements.elementname',
-     *                                      'theme.elementname'; or relative e.g.
-     *                                      'elementname', 'elements.elementname'
-     *                                      in which case it will be resolved
-     *                                      from the theme hosting the current
-     *                                      view.
-     * @param array $data                   the data to populate the element
-     *                                      with.
-     * @param array $options                the options governing element
-     *                                      appearance and behavior. Among them
-     *                                      might be the 'property_map'
-     * @param ThemeResource|null $resource  the resource containing the path to
-     *                                      element file or directory, if
-     *                                      precalculated elsewhere.
+     * @param string $name                      the name of the element, either absolute
+     *                                          (e.g. 'miravel::theme.elements.elementname',
+     *                                          'theme.elementname'); or relative e.g.
+     *                                          'elementname', 'elements.elementname'
+     *                                          in which case it will be resolved from the theme
+     *                                          hosting the current view.
+     * @param array $data                       the data to populate the element with.
+     * @param array $options                    the options governing element
+     *                                          appearance and behavior. Among them
+     *                                          might be the 'property_map'
+     * @param BaseThemeResource|null $resource  the resource containing the path to
+     *                                          element file or directory, if
+     *                                          precalculated elsewhere.
      */
     public function __construct(
         string $name,
         $data = [],
         array $options = [],
-        BaseThemeResource $resource = null
+        BaseThemeResource $resource
     ) {
         $this->setOptions($options);
         $this->initResource($resource);
         $this->initName($name);
-        $this->initPaths();
         $this->setData($data);
         $this->setupPropertyMap($options);
         $this->initSignature();
         $this->setExpectations();
-    }
-
-    /**
-     * Set up the paths to directories and files used by this element.
-     */
-    protected function initPaths()
-    {
-        if (!$this->resource || !$this->resource instanceof ThemeResource) {
-            return;
-        }
-
-        $this->paths['view'] = $this->resource->getViewFile();
-
-        if ($this->resource->isDir()) {
-            $this->paths['directory'] = $this->resource->getPathname();
-        }
     }
 
     /**
@@ -112,7 +92,7 @@ class Element
      */
     protected function initName($name)
     {
-        if (static::isFullyQualifiedName($name)) {
+        if ($this->isFullyQualifiedName($name)) {
             $this->name = $name;
         } else {
             $this->name = $this->prependThemePrefix($name);
@@ -127,17 +107,11 @@ class Element
     /**
      * @param BaseThemeResource $resource
      */
-    protected function initResource(BaseThemeResource $resource = null)
+    protected function initResource(BaseThemeResource $resource)
     {
-        if (!$resource) {
-            $resource = ResourceResolver::resolveElement($this->name);
-        }
-
         $this->resource = $resource;
 
-        if ($theme = $resource->getTheme()) {
-            $this->setTheme($theme);
-        }
+        $this->setTheme($resource->getCallingTheme());
     }
 
     /**
@@ -145,9 +119,12 @@ class Element
      *
      * @return bool
      */
-    protected static function isFullyQualifiedName(string $name)
+    protected function isFullyQualifiedName(string $name)
     {
-        return (false !== strpos($name, '.'));
+        $themeName = $this->getTheme()->getName();
+        $themeName .= '.';
+
+        return 0 === strpos($name, $themeName);
     }
 
     /**
@@ -180,7 +157,7 @@ class Element
     }
 
     /**
-     * @return null|ThemeResource
+     * @return null|BaseThemeResource
      */
     public function getResource()
     {
@@ -188,9 +165,9 @@ class Element
     }
 
     /**
-     * @param ThemeResource $resource
+     * @param BaseThemeResource $resource
      */
-    public function setResource(ThemeResource $resource)
+    public function setResource(BaseThemeResource $resource)
     {
         $this->resource = $resource;
     }

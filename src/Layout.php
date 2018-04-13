@@ -2,6 +2,8 @@
 
 namespace Miravel;
 
+use Miravel\Resources\BaseThemeResource;
+
 /**
  * Class Layout
  *
@@ -27,16 +29,16 @@ class Layout
     protected $theme;
 
     /**
-     * @var ThemeResource
+     * @var BaseThemeResource
      */
     protected $resource;
 
     /**
      * Layout constructor.
      *
-     * @param ThemeResource $resource
+     * @param BaseThemeResource $resource
      */
-    public function __construct(ThemeResource $resource)
+    public function __construct(BaseThemeResource $resource)
     {
         $this->setResource($resource);
     }
@@ -123,7 +125,7 @@ class Layout
         return $this;
     }
 
-    public function setResource(ThemeResource $resource)
+    public function setResource(BaseThemeResource $resource)
     {
         $this->resource = $resource;
 

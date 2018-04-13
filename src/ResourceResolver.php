@@ -100,7 +100,7 @@ class ResourceResolver
      *                                      same theme that the calling view belongs
      *                                      to.
      *
-     * @return null|BaseThemeResource|void  ThemeResource containing the path to
+     * @return null|BaseThemeResource|void  Theme resource containing the path to
      *                                      resource file or directory.
      */
     public function resolve(string $rawResourceName)

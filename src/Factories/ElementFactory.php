@@ -3,9 +3,8 @@
 namespace Miravel\Factories;
 
 use Miravel\Exceptions\ElementNotFoundException;
-use Miravel\Facade as MiravelFacade;
 use Miravel\Resources\BaseThemeResource;
-use Miravel\ThemeResource;
+use Miravel\Facade as MiravelFacade;
 use Miravel\Utilities;
 use Miravel\Element;
 
@@ -74,11 +73,11 @@ class ElementFactory extends BaseViewFactory
      * the name of the custom element class. If such a class is found, autoload
      * it if necessary.
      *
-     * @param ThemeResource $resource  the ThemeResource containing the path to
-     *                                 directory.
+     * @param BaseThemeResource $resource  the resource containing the directory
+     *                                     path.
      *
-     * @return string|void             the class name that can be instantiated,
-     *                                 or null if the class does not exist.
+     * @return string|void                 the class name that can be instantiated,
+     *                                     or null if the class does not exist.
      */
     protected static function getCustomClassName(BaseThemeResource $resource)
     {
