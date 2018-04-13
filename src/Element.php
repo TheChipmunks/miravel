@@ -5,6 +5,7 @@ namespace Miravel;
 use Miravel\Events\FinishElementRenderEvent;
 use Miravel\Events\StartElementRenderEvent;
 use Miravel\Traits\AccessesDataProperties;
+use Miravel\Resources\BaseThemeResource;
 use Miravel\Traits\ExpectsDataFormats;
 use Illuminate\Support\Facades\View;
 use Miravel\Traits\HasOptions;
@@ -76,7 +77,7 @@ class Element
         string $name,
         $data = [],
         array $options = [],
-        ThemeResource $resource = null
+        BaseThemeResource $resource = null
     ) {
         $this->setOptions($options);
         $this->initResource($resource);
@@ -124,9 +125,9 @@ class Element
     }
 
     /**
-     * @param ThemeResource|null $resource
+     * @param BaseThemeResource $resource
      */
-    protected function initResource(ThemeResource $resource = null)
+    protected function initResource(BaseThemeResource $resource = null)
     {
         if (!$resource) {
             $resource = ResourceResolver::resolveElement($this->name);

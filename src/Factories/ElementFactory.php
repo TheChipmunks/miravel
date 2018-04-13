@@ -4,6 +4,7 @@ namespace Miravel\Factories;
 
 use Miravel\Exceptions\ElementNotFoundException;
 use Miravel\Facade as MiravelFacade;
+use Miravel\Resources\BaseThemeResource;
 use Miravel\ThemeResource;
 use Miravel\Utilities;
 use Miravel\Element;
@@ -38,11 +39,24 @@ class ElementFactory extends BaseViewFactory
      *
      * @return Element        the instantiated element.
      */
-    public static function make(string $name, $data = [], array $options = []): Element {
+    public static function make(
+        string $name,
+        $data = [],
+        array $options = []
+    ): Element {
         if (!$resource = static::resolveResource($name)) {
             MiravelFacade::exception(ElementNotFoundException::class, compact('name'), __FILE__, __LINE__);
         }
 
+        return static::makeFromResource($name, $resource, $data, $options);
+    }
+
+    public static function makeFromResource(
+        string $name,
+        BaseThemeResource $resource,
+        $data = [],
+        array $options = []
+    ) {
         $className = static::getCustomClassName($resource);
 
         if (
@@ -66,10 +80,9 @@ class ElementFactory extends BaseViewFactory
      * @return string|void             the class name that can be instantiated,
      *                                 or null if the class does not exist.
      */
-    protected static function getCustomClassName(ThemeResource $resource)
+    protected static function getCustomClassName(BaseThemeResource $resource)
     {
-        $classFileName = static::getClassFileName();
-        $classFilePath = $resource->getClassFile($classFileName);
+        $classFilePath = $resource->getClassFile();
 
         // see if class file exists in directory
         if (!$classFilePath) {
@@ -92,11 +105,6 @@ class ElementFactory extends BaseViewFactory
         }
 
         return $className;
-    }
-
-    protected static function getClassFileName()
-    {
-        return MiravelFacade::getConfig('class_file_name');
     }
 }
 

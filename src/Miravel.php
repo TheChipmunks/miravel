@@ -7,6 +7,7 @@ use Miravel\Factories\ElementFactory;
 use Miravel\Factories\LoggerFactory;
 use Miravel\Factories\LayoutFactory;
 use Miravel\Factories\ThemeFactory;
+use Miravel\Traits\RendersHtmlCode;
 use Miravel\Traits\Loggable;
 use Illuminate\View\View;
 
@@ -19,7 +20,7 @@ use Illuminate\View\View;
  */
 class Miravel
 {
-    use Loggable, ProvidesBladeDirectives;
+    use Loggable, ProvidesBladeDirectives, RendersHtmlCode;
 
     /**
      * @var string
@@ -328,19 +329,20 @@ class Miravel
         }
     }
 
-    public function renderHtmlAttributes()
+    /**
+     * Get the theme that initiated current rendering procedure. It might be the
+     * parent theme of current top level element, or the theme hosting the view
+     * currently being rendered.
+     */
+    public function getCurrentTheme()
     {
-        return Utilities::renderHtmlAttributes();
-    }
+        if ($elementName = $this->getTopLevelRenderingElement()) {
+            $themeName = substr($elementName, 0, strpos($elementName, '.'));
 
-    public function renderBodyAttributes()
-    {
-        return Utilities::renderBodyAttributes();
-    }
+            return $this->makeAndValidateTheme($themeName);
+        }
 
-    public function renderMetaTags()
-    {
-        return Utilities::renderMetaTags();
+        return $this->getCurrentViewParentTheme();
     }
 
 }

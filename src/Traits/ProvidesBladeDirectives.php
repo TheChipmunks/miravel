@@ -162,7 +162,7 @@ EOF;
     protected function resolveThemeView($expression)
     {
         // TODO: move to theme
-        if (!$theme = MiravelFacade::getCurrentViewParentTheme()) {
+        if (!$theme = MiravelFacade::getCurrentTheme()) {
             throw new Exception('unable to figure out current theme');
         }
 

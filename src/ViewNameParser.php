@@ -62,7 +62,7 @@ class ViewNameParser
 
     public function getType()
     {
-        return ($this->countParts() > 2) ? substr($this->parts[1], 0, -1) : null;
+        return ($this->countParts() > 2) ? $this->parts[1] : null;
     }
 
     public function getName()
@@ -70,7 +70,13 @@ class ViewNameParser
         $count = $this->countParts();
         $last  = $count - 1;
 
-        return ($count > 1) ? $this->parts[$last] : null;
+        if ($count == 2 || $count == 3) {
+            return $this->parts[$last];
+        }
+
+        if ($count > 3) {
+            return implode('.', array_slice($this->parts, 2));
+        }
     }
 
     public function countParts()
@@ -101,13 +107,13 @@ class ViewNameParser
     public function isMiravelLayout()
     {
         return $this->isMiravelNamespacedView() &&
-               'layout' == $this->getType();
+               'layouts' == $this->getType();
     }
 
     public function isMiravelElement()
     {
         return $this->isMiravelNamespacedView() &&
-               'element' == $this->getType();
+               'elements' == $this->getType();
     }
 
     protected function parse(string $viewName)

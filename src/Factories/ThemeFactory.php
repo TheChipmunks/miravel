@@ -33,7 +33,8 @@ class ThemeFactory
     public static function make(string $themeName): Theme
     {
         if (!isset(static::$themeRegistry[$themeName])) {
-            // when a theme is constructed it must be registered on the global registry
+            // when a theme is constructed it must be registered on the global
+            // registry
             static::instantiate($themeName);
         }
 

@@ -2,6 +2,7 @@
 
 namespace Miravel;
 
+use Miravel\Exceptions\CurrentThemeException;
 use Miravel\Facade as MiravelFacade;
 
 /**
@@ -14,191 +15,225 @@ use Miravel\Facade as MiravelFacade;
  */
 class ResourceResolver
 {
-    protected $viewType;
+    /**
+     * @var string
+     */
+    protected $themeName = '';
+
+    /**
+         * @var string
+         */
+    protected $resourceType = '';
+
+    /**
+         * @var string
+         */
+    protected $resourceName = '';
 
     /**
      * ViewNameResolver constructor.
      *
-     * @param string $viewType  may be 'elements', 'layouts', or 'templates'
+     * @param string $resourceType  may be 'elements', 'layouts', or 'templates'
+     * @param string $themeName     theme name, if known (optional)
      */
-    public function __construct(string $viewType)
+    public function __construct(string $resourceType, string $themeName = '')
     {
-        $this->viewType = $viewType;
+        $this->setResourceType($resourceType);
+
+        if (!empty($themeName)) {
+            $this->setThemeName($themeName);
+        }
     }
 
     /**
      * Resolve an element view.
      *
-     * @param string $viewName
+     * @param string $resourceName
      *
      * @return null|string|void  the resolved directory or file path.
      */
-    public static function resolveElement(string $viewName)
+    public static function resolveElement(string $resourceName)
     {
         $resolver = new static('elements');
 
-        return $resolver->resolve($viewName);
+        return $resolver->resolve($resourceName);
     }
 
     /**
      * Resolve a layout view.
      *
-     * @param string $viewName
+     * @param string $resourceName
      *
      * @return null|string|void  the resolved directory or file path.
      */
-    public static function resolveLayout(string $viewName)
+    public static function resolveLayout(string $resourceName)
     {
         $resolver = new static('layouts');
 
-        return $resolver->resolve($viewName);
+        return $resolver->resolve($resourceName);
     }
 
     /**
      * Resolve a template view.
      *
-     * @param string $viewName
+     * @param string $resourceName
      *
      * @return null|string|void  the resolved directory or file path.
      */
-    public static function resolveTemplate(string $viewName)
+    public static function resolveTemplate(string $resourceName)
     {
         $resolver = new static('templates');
 
-        return $resolver->resolve($viewName);
+        return $resolver->resolve($resourceName);
     }
 
     /**
      * Translates view names to file or directory paths. File path is the actual
      * view path, while directory is the one containing the template file.
      *
-     * @param string $viewName          the absolute name (e.g.
-     *                                  "miravel::theme.elements.name",
-     *                                  "theme.elements.name",
-     *                                  "theme.elementname")
-     *                                  or relative name (like "elementname").
-     *                                  Relative names will be resolved from the
-     *                                  same theme that the calling view belongs
-     *                                  to.
+     * @param string $rawResourceName       the absolute name (e.g.
+     *                                      "miravel::theme.elements.name",
+     *                                      "theme.elements.name",
+     *                                      "theme.elementname")
+     *                                      or relative name (like "elementname").
+     *                                      Relative names will be resolved from the
+     *                                      same theme that the calling view belongs
+     *                                      to.
      *
-     * @return null|ThemeResource|void  ThemeResource containing the path to
-     *                                  resource file or directory.
+     * @return null|BaseThemeResource|void  ThemeResource containing the path to
+     *                                      resource file or directory.
      */
-    public function resolve(string $viewName)
+    public function resolve(string $rawResourceName)
     {
-        if (empty($viewName)) {
+        if (empty($rawResourceName)) {
             return;
         }
 
-        $parser = new ViewNameParser($viewName);
+        // initialize $this->themeName and $this->resourceName
+        $this->initNameComponents($rawResourceName);
 
-        // Absolute name, e.g. miravel::theme.elements.elementname
+        if (!$theme = MiravelFacade::makeAndValidateTheme($this->themeName)) {
+            MiravelFacade::exception(CurrentThemeException::class, [], __FILE__, __LINE__);
+        }
+
+        $relativeResourceName = $this->getNameRelativeToTheme();
+
+        return $theme->getResource($relativeResourceName);
+    }
+
+    /**
+     * Make sure we have all three parts:
+     * - theme name
+     * - resource type
+     * - resource name
+     *
+     * @param string $rawResourceName
+     */
+    public function initNameComponents(string $rawResourceName)
+    {
+        $parser = new ViewNameParser($rawResourceName);
+
         if ($parser->isMiravelNamespacedView()) {
-            return $this->resolveFromTheme(
-                $parser->getTheme(),
-                $parser->getName()
-            );
-        }
-
-        // Relative name
-        $parts = $parser->getParts();
-
-        // 'elementname' or 'layoutname' or 'templatename'
-        if (count($parts) == 1) {
-            // if this is an element called by another element, try resolving it
-            // from the parent element's theme
-            if ($resource = $this->tryResolveElementFromTopLevel($parts[0])) {
-                return $resource;
+            // we've got a fully qualified path to a resource, e.g.
+            // miravel::theme.elements.elementname
+            $this->setThemeName($parser->getTheme());
+            $this->setResourceName($parser->getName());
+        } else {
+            // we've got a partial name, attempt to restore components
+            $nameParts = $parser->getParts();
+            $count = count($nameParts);
+            switch ($count) {
+                case 1:
+                    // ask Miravel for current theme name
+                    $this->setThemeName($this->getCurrentTheme());
+                    $this->setResourceName($nameParts[0]);
+                    break;
+                case 2:
+                    $this->setThemeName($nameParts[0]);
+                    $this->setResourceName($nameParts[1]);
+                    break;
+                default:
+                    $this->setThemeName($parser->getTheme());
+                    $this->setResourceType($parser->getType());
+                    $this->setResourceName($parser->getName());
             }
+        }
+    }
 
-            return $this->resolveFromCurrentTheme($parts[0]);
+    /**
+     * Try to define the current theme (the theme that has initiated the current
+     * render).
+     *
+     * @return mixed
+     */
+    protected function getCurrentTheme()
+    {
+        if (!$currentTheme = MiravelFacade::getCurrentTheme()) {
+            MiravelFacade::exception(CurrentThemeException::class, [], __FILE__, __LINE__);
         }
 
-        // 'themename.elementname' or 'themename.layoutname'
-        if (count($parts) == 2) {
-            return $this->resolveFromTheme($parts[0], $parts[1]);
-        }
+        return $currentTheme->getName();
+    }
 
-        // 'theme.elements.elementname[.whatever.else]'
-        // 'theme.layouts.layoutname[.whatever.else]'
-        return $this->resolveFromViewParts($parts);
+    /**
+     * Get the full name but omitting the theme name, e.g.
+     * elements.elementname
+     *
+     * @return string
+     */
+    public function getNameRelativeToTheme()
+    {
+        return implode('.', [
+            $this->getResourceType(),
+            $this->getResourceName()
+        ]);
+    }
+
+    /**
+         * @return string
+         */
+    public function getThemeName(): string
+    {
+        return $this->themeName;
     }
 
     /**
      * @param string $themeName
-     * @param string $resourceName
-     *
-     * @return null|ThemeResource|void
      */
-    protected function resolveFromTheme(string $themeName, string $resourceName)
+    public function setThemeName(string $themeName)
     {
-        $theme = MiravelFacade::makeTheme($themeName);
-        if ($theme->exists()) {
-            $resourceName = $this->getTypeAwareName($resourceName);
+        $this->themeName = $themeName;
+    }
 
-            return $theme->getResource($resourceName);
-        }
+    /**
+     * @return string
+     */
+    public function getResourceType(): string
+    {
+        return $this->resourceType;
+    }
+
+    /**
+     * @param string $resourceType
+     */
+    public function setResourceType(string $resourceType)
+    {
+        $this->resourceType = $resourceType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResourceName(): string
+    {
+        return $this->resourceName;
     }
 
     /**
      * @param string $resourceName
-     *
-     * @return null|ThemeResource|void
      */
-    protected function resolveFromCurrentTheme(string $resourceName)
+    public function setResourceName(string $resourceName)
     {
-        $theme = MiravelFacade::getCurrentViewParentTheme();
-
-        if ($theme) {
-            $resourceName = $this->getTypeAwareName($resourceName);
-
-            return $theme->getResource($resourceName);
-        }
-    }
-
-    /**
-     * @param array $parts
-     *
-     * @return null|ThemeResource|void
-     */
-    protected function resolveFromViewParts(array $parts)
-    {
-        $themeName = $parts[0];
-        $viewName  = implode('.', array_slice($parts, 1));
-        $theme     = MiravelFacade::makeTheme($themeName);
-
-        if ($theme->exists()) {
-            return $theme->getResource($viewName);
-        }
-    }
-
-    /**
-     * 'elementname' becomes 'elements.elementname'. This makes it possible to
-     * pass it to theme class for lookup.
-     *
-     * @param $name    the resource name to prepend with type.
-     *
-     * @return string  the converted name.
-     */
-    protected function getTypeAwareName($name)
-    {
-        return sprintf('%s.%s', $this->viewType, $name);
-    }
-
-    protected function tryResolveElementFromTopLevel($name)
-    {
-        if ('elements' !== $this->viewType) {
-            return;
-        }
-
-        if (!$topLevel = MiravelFacade::getTopLevelRenderingElement()) {
-            return;
-        }
-
-        if (!$themeName = substr($topLevel, 0, strpos($topLevel, '.'))) {
-            return;
-        }
-
-        return $this->resolveFromTheme($themeName, $name);
+        $this->resourceName = $resourceName;
     }
 }

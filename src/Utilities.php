@@ -156,6 +156,14 @@ class Utilities
         return $basename;
     }
 
+    /**
+     * Examine a view object and see if its path is inside a known theme.
+     * If yes, return the theme object, otherwise null.
+     *
+     * @param View $view
+     *
+     * @return Theme|void
+     */
     public static function viewBelongsToTheme(View $view)
     {
         $path = $view->getPath();
@@ -163,10 +171,82 @@ class Utilities
         return static::pathBelongsToTheme($path);
     }
 
+    /**
+     * Examine an arbitrary path and see if it is inside a known theme.
+     * If yes, return the theme object; if no, return null.
+     *
+     * @param string $path  the path to examine
+     *
+     * @return Theme|void
+     */
     public static function pathBelongsToTheme(string $path)
     {
-        if ($themeName = Theme::getThemeNameFromViewPath($path)) {
+        if ($themeName = static::getThemeNameFromPath($path)) {
             return MiravelFacade::makeAndValidateTheme($themeName);
+        }
+    }
+
+    /**
+     * If a path contains a theme name, return it.
+     *
+     * @param string $path  the path to the view file or directory.
+     *
+     * @return string|void
+     */
+    public static function getThemeNameFromPath(string $path)
+    {
+        $result = static::getPathComponents($path);
+
+        if (!is_array($result)) {
+            return;
+        }
+
+        return $result['theme'];
+    }
+
+    /**
+     * Given an arbitrary filesystem path, try to extract root path, theme name,
+     * component type, and component path relative to its theme.
+     *
+     * @param string $path
+     *
+     * @return array  ['root' => '...', 'theme' => '...', 'relative' => '...']
+     */
+    public static function getPathComponents(string $path)
+    {
+        $lookupPaths = static::getThemeDirPaths();
+
+        foreach ($lookupPaths as $lookupPath) {
+            $lookupPath = realpath($lookupPath);
+            if (0 !== strpos($path, $lookupPath)) {
+                continue;
+            }
+
+            $relative = substr($path, strlen($lookupPath));
+            $relative = trim($relative, DIRECTORY_SEPARATOR);
+
+            if (
+                !strlen($relative) ||
+                0 === strpos($relative, DIRECTORY_SEPARATOR)
+            ) {
+                continue;
+            }
+
+            $segments = explode(DIRECTORY_SEPARATOR, $relative);
+
+            $components = [
+                'root'     => $lookupPath,
+                'theme'    => $segments[0],
+            ];
+
+            $components['type'] = (count($segments) > 2) ? $segments[1] : null;
+
+            $components['relative'] = implode(
+                DIRECTORY_SEPARATOR,
+                array_slice($segments, 1)
+            );
+
+            return $components;
         }
     }
 
@@ -205,7 +285,7 @@ class Utilities
         return false !== stripos(PHP_OS, 'WIN');
     }
 
-    public static function viewNameDotsToSlashes($name)
+    public static function dotsToSlashes($name)
     {
         return str_replace('.', DIRECTORY_SEPARATOR, $name);
     }
@@ -296,5 +376,35 @@ class Utilities
         }
 
         return $output;
+    }
+
+    /**
+     * Compare file names and tell if they are equal in terms of filesystem (ie
+     * refer to the same file). On Windows, make comparison case insensitive,
+     * correctly supporting multibyte names.
+     *
+     * @param $filename1
+     * @param $filename2
+     *
+     * @return bool  true if file names are equal in terms of filesystem, false
+     *               otherwise.
+     */
+    public static function FileNameCmp($filename1, $filename2)
+    {
+        if (!static::isWin()) {
+            return strcmp($filename1, $filename2) ? false : true;
+        }
+
+        return static::mbStrCmp($filename1, $filename2);
+    }
+
+    protected static function mbStrCmp($str1, $str2)
+    {
+        $encoding = mb_internal_encoding();
+
+        $str1 = mb_strtoupper($str1, $encoding);
+        $str2 = mb_strtoupper($str2, $encoding);
+
+        return strcmp($str1, $str2) ? false : true;
     }
 }

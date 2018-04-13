@@ -3,7 +3,11 @@
 namespace Miravel;
 
 use Miravel\Facade as MiravelFacade;
+use Miravel\Factories\ElementFactory;
+use Miravel\Factories\ResourceFactory;
 use Miravel\Factories\ThemeFactory;
+use Miravel\Resources\BaseThemeResource;
+use Symfony\Component\HttpKernel\Tests\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPassTest;
 
 /**
  * Class Theme
@@ -58,6 +62,14 @@ class Theme
         $this->register();
 
         $this->initParentTheme();
+    }
+
+    /**
+     * Register the theme on the global register
+     */
+    protected function register()
+    {
+        ThemeFactory::register($this->getName(), $this);
     }
 
     /**
@@ -148,36 +160,6 @@ class Theme
         }
 
         return static::$themeDirPaths;
-    }
-
-    /**
-     * If a view path contains a theme name, return it.
-     *
-     * @param string $viewPath  the path to the view file or directory.
-     *
-     * @return string|void
-     */
-    public static function getThemeNameFromViewPath(string $viewPath)
-    {
-        // TODO: move to Utilities
-
-        $lookupPaths = static::getThemeDirPaths();
-
-        foreach ($lookupPaths as $lookupPath) {
-            $lookupPath = realpath($lookupPath);
-            if (0 !== strpos($viewPath, $lookupPath)) {
-                continue;
-            }
-
-            $relative = substr($viewPath, strlen($lookupPath));
-            $relative = trim($relative, DIRECTORY_SEPARATOR);
-            $segments = explode(DIRECTORY_SEPARATOR, $relative);
-            if (count($segments) <= 1) {
-                continue;
-            }
-
-            return $segments[0];
-        }
     }
 
     /**
@@ -322,40 +304,47 @@ class Theme
 
     /**
      * Given a relative resource name (e.g. layout or element name, or a static
-     * asset) return its full absolute path, or null if not found.
+     * asset) return the resource, or null if not found.
      *
      * The lookup is done in this theme and its parent hierarchy, if any.
      *
-     * @param string $name            a file path e.g. 'layouts/basic/style.css' OR
-     *                                a template definition e.g. 'elements.grid'
-     * @param array $processedThemes  global list of themes that have already
-     *                                been processed during current lookup
+     * @param string $name                  a file path e.g. 'layouts/basic/style.css'
+     *                                      OR a dot definition e.g. 'elements.grid'
+     * @param array $extensions             an array of file extensions to try
+     * @param array $processedThemes        global list of themes that have already
+     *                                      been processed during current lookup
      *
-     * @return null|ThemeResource     ThemeResource object containing the path
-     *                                to the file or directory
+     * @return null|BaseThemeResource|void  resource object containing the path
+     *                                      to the file or directory
      */
-    public function getResource(string $name, array $processedThemes = [])
-    {
+    public function getResource(
+        string $name,
+        array $extensions = [],
+        array $processedThemes = []
+    ) {
         // global list is used to prevent infinite loop on circular reference
         // e.g. when 2 themes extend each other
         if (in_array($this->name, $processedThemes)) {
             return;
         }
 
-        // look in this theme
-        $resource = $this->lookupResource($name);
+        $resource = null;
 
-        // look in parent themes, if any
-        if (!$resource && $this->parentTheme) {
+        if ($path = $this->lookupResource($name, $extensions)) {
+
+            // found in this theme
+            return $this->makeResource($path);
+
+        } elseif ($this->parentTheme) {
+
+            // look in parent themes, if any
             $processedThemes[] = $this->name;
-            $resource = $this->parentTheme->getResource($name, $processedThemes);
+            return $this->parentTheme->getResource(
+                $name,
+                $extensions,
+                $processedThemes
+            );
         }
-
-        if ($resource) {
-            $resource->setTheme($this);
-        }
-
-        return $resource;
     }
 
     /**
@@ -387,87 +376,78 @@ class Theme
     }
 
     /**
+     * Given resource name, return the filesystem path
+     *
      * @param string $name
+     *
+     * @param array $extensions
      *
      * @return string|void
      */
-    protected function lookupResource(string $name)
+    protected function lookupResource(string $name, array $extensions = [])
     {
         if (empty($name)) {
             return;
         }
 
-        // assume a static / source file first
-        if ($path = $this->lookupFile($name)) {
-            return new ThemeResource($path);
+        // assume literal path first
+        if ($path = $this->lookupPath($name, $extensions)) {
+            return $path;
         }
 
-        $relative = Utilities::viewNameDotsToSlashes($name);
+        // then try to expand dot notation
+        $expanded = Utilities::dotsToSlashes($name);
 
-        // see if requested path is a directory
-        if ($path = $this->lookupDirectory($relative)) {
-            return new ThemeResource($path);
-        }
-
-        // see if requested path is a template with one of configured template
-        // extensions
-        if ($path = $this->lookupTemplateFile($relative)) {
-            return new ThemeResource($path);
+        if ($path = $this->lookupPath($expanded, $extensions)) {
+            return $path;
         }
     }
 
     /**
      * @param string $relativePath
      *
+     * @param array $extensions
+     *
      * @return string|void
      */
-    protected function lookupFile(string $relativePath)
+    protected function lookupPath(string $relativePath, array $extensions = [])
     {
         foreach ($this->paths as $pathname => $path) {
             $fullpath = implode(DIRECTORY_SEPARATOR, [$path, $relativePath]);
-            if (file_exists($fullpath)) {
+
+            if (empty($extensions) && file_exists($fullpath)) {
                 return $fullpath;
             }
-        }
-    }
 
-    /**
-     * @param string $relativePath
-     *
-     * @return string|void
-     */
-    protected function lookupTemplateFile(string $relativePath)
-    {
-        $extensions = (array)MiravelFacade::getConfig('template_file_extensions');
-
-        foreach ($extensions as $extension) {
-            $completePath = "$relativePath.$extension";
-            if ($match = $this->lookupFile($completePath)) {
-                return $match;
+            if (!empty($extensions)) {
+                foreach ($extensions as $ext) {
+                    $fullpath .= ".$ext";
+                    if (file_exists($fullpath)) {
+                        return $fullpath;
+                    }
+                }
             }
         }
     }
 
-    /**
-     * @param string $relativePath
-     *
-     * @return string|void
-     */
-    protected function lookupDirectory(string $relativePath)
+    public function makeResource(string $path)
     {
-        foreach ($this->paths as $pathname => $path) {
-            $fullpath = implode(DIRECTORY_SEPARATOR, [$path, $relativePath]);
-            if (is_dir($fullpath)) {
-                return $fullpath;
-            }
-        }
+        $resource = ResourceFactory::make($path, $this);
+
+        $resource->setCallingTheme($this);
     }
 
-    /**
-     * Register the theme on the global register
-     */
-    protected function register()
+    public function getElement(string $name, $data = [], array $options = [])
     {
-        ThemeFactory::register($this->getName(), $this);
+        if (!$resource = $this->getResource("elements.$name")) {
+            return;
+        }
+
+        return ElementFactory::makeFromResource(
+            $name,
+            $resource,
+            $data,
+            $options
+        );
     }
 }
