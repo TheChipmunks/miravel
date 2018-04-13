@@ -97,11 +97,11 @@ To start playing with the view file, just copy it from the ```vendor``` folder t
 
 E.g. to override the "fixed" layout from the "default" theme, copy:
 
-_vendor/miravel/resources/themes/**default/layouts/fixed/view.blade.php**_
+_vendor/miravel/miravel/resources/themes/**default/layouts/fixed/view.blade.php**_
 
 to
 
-_app/resources/views/vendor/miravel/**default/layouts/fixed/view.blade.php**_
+_app/resources/vendor/miravel/**default/layouts/fixed/view.blade.php**_
 
 Miravel offer an artisan one-liner for this operation to somewhat shorten your typing:
 
