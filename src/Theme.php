@@ -2,12 +2,11 @@
 
 namespace Miravel;
 
-use Miravel\Facade as MiravelFacade;
-use Miravel\Factories\ElementFactory;
-use Miravel\Factories\ResourceFactory;
-use Miravel\Factories\ThemeFactory;
 use Miravel\Resources\BaseThemeResource;
-use Symfony\Component\HttpKernel\Tests\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPassTest;
+use Miravel\Factories\ResourceFactory;
+use Miravel\Factories\ElementFactory;
+use Miravel\Facade as MiravelFacade;
+use Miravel\Factories\ThemeFactory;
 
 /**
  * Class Theme
@@ -328,8 +327,32 @@ class Theme
             return;
         }
 
-        $resource = null;
+        if ($resource = $this->findResourceInThemeHierarchy(
+            $name,
+            $extensions,
+            $processedThemes
+        )) {
+            $resource->setCallingTheme($this);
 
+            return $resource;
+        }
+    }
+
+    /**
+     * Look for resource in this theme; failing that, delegate the search to
+     * parent themes.
+     *
+     * @param string $name
+     * @param array $extensions
+     * @param array $processedThemes
+     *
+     * @return BaseThemeResource|void
+     */
+    protected function findResourceInThemeHierarchy(
+        string $name,
+        array $extensions,
+        array &$processedThemes
+    ) {
         if ($path = $this->lookupResource($name, $extensions)) {
 
             // found in this theme
@@ -434,8 +457,6 @@ class Theme
     {
         $resource = ResourceFactory::make($path, $this);
 
-        $resource->setCallingTheme($this);
-
         return $resource;
     }
 
@@ -452,4 +473,6 @@ class Theme
             $options
         );
     }
+
+
 }
