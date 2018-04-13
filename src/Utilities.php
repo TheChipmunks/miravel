@@ -214,7 +214,7 @@ class Utilities
      */
     public static function getPathComponents(string $path)
     {
-        $lookupPaths = static::getThemeDirPaths();
+        $lookupPaths = Theme::getThemeDirPaths();
 
         foreach ($lookupPaths as $lookupPath) {
             $lookupPath = realpath($lookupPath);
