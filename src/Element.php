@@ -194,7 +194,7 @@ class Element
     {
         event(new StartElementRenderEvent($this));
 
-        $viewPath = $this->getViewPath();
+        $viewPath = $this->getViewName();
         $viewVars = $this->prepareViewVars();
 
         if ($viewPath) {
@@ -214,9 +214,9 @@ class Element
      *
      * @return string  the view name in Laravel format (dot separated).
      */
-    protected function getViewPath()
+    protected function getViewName()
     {
-        return $this->paths['view'] ?? '';
+        return $this->getResource()->getViewFile();
     }
 
     /**
