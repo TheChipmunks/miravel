@@ -435,6 +435,8 @@ class Theme
         $resource = ResourceFactory::make($path, $this);
 
         $resource->setCallingTheme($this);
+
+        return $resource;
     }
 
     public function getElement(string $name, $data = [], array $options = [])
