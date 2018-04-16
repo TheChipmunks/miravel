@@ -5,7 +5,6 @@ namespace Miravel\Buid;
 use  Miravel\Buid\Resources\Css;
 use  Miravel\Buid\Resources\Js;
 
-//npm run production -- --env.mixfile=storage/miravel/test-child/webpack.mix.js
 
 class Mix {
     

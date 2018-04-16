@@ -8,6 +8,7 @@ use Miravel\Exceptions\ThemeNotFoundException;
 use  Miravel\Buid\Resources\Css;
 use  Miravel\Buid\Resources\Js;
 use  Miravel\Buid\Mix as MiravelMix;
+use  Miravel\Buid\Npm as MiravelNpm;
 use  Miravel\Utilities;
 
 class Build {
@@ -18,6 +19,8 @@ class Build {
     protected $Resurses = [];
     
     protected $Dist = null;
+    protected $RootDir = null;
+    protected $WebPackFile = null;
     
     
     public function __construct(string $themeName) {
@@ -29,6 +32,7 @@ class Build {
             
         $this->themeConfig = $this->Theme->getConfig();
         $this->Dist = Utilities::getDistPath()  . DIRECTORY_SEPARATOR . $this->Theme->getName() . DIRECTORY_SEPARATOR;
+        $this->RootDir = base_path() . DIRECTORY_SEPARATOR;
         
         $this->init();
     }
@@ -90,7 +94,12 @@ class Build {
     
     public function generate() {
         $Mix = new MiravelMix($this->Resurses, $this->Dist);
-        echo $Mix->generate();
+        $this->WebPackFile = $Mix->generate();
+    }
+    
+    public function execute() {
+        $Npm = new MiravelNpm($this->RootDir, str_replace($this->RootDir, '', $this->WebPackFile));
+        return $Npm->execute();
     }
     
 }

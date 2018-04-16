@@ -42,5 +42,15 @@ class MiravelBuild extends Command
         $Name = $this->argument('name');
         $Build = new Build($Name);
         $Build->generate();
+        
+        $IsSuccess = false;
+        foreach ($Build->execute() as $Info){
+            if(strstr($Info, "Compiled successfully") || $IsSuccess){
+                $this->info($Info);
+                $IsSuccess = true;
+            } else {
+                $this->warn($Info);
+            }
+        }
     }
 }
