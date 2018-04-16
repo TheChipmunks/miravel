@@ -5,8 +5,9 @@ namespace Miravel;
 use Miravel\Facade as MiravelFacade;
 use Miravel\Exceptions\ThemeNotFoundException;
 
-use  Miravel\Buid\Css;
-use  Miravel\Buid\Js;
+use  Miravel\Buid\Resources\Css;
+use  Miravel\Buid\Resources\Js;
+use  Miravel\Buid\Mix as MiravelMix;
 use  Miravel\Utilities;
 
 class Build {
@@ -15,6 +16,8 @@ class Build {
     protected $themeConfig = null;
     
     protected $Resurses = [];
+    
+    protected $Dist = null;
     
     
     public function __construct(string $themeName) {
@@ -25,6 +28,7 @@ class Build {
         }
             
         $this->themeConfig = $this->Theme->getConfig();
+        $this->Dist = Utilities::getDistPath()  . DIRECTORY_SEPARATOR . $this->Theme->getName() . DIRECTORY_SEPARATOR;
         
         $this->init();
     }
@@ -61,7 +65,7 @@ class Build {
                 }
             }
             
-            $this->Resurses[$BundleName]->setDist(Utilities::getDistPath()  . DIRECTORY_SEPARATOR . $Data['dist']);
+            $this->Resurses[$BundleName]->setDist($this->Dist . $Data['dist']);
         }
     }
     
@@ -80,8 +84,13 @@ class Build {
                 }
             }
             
-            $this->Resurses[$BundleName]->setDist(Utilities::getDistPath() . DIRECTORY_SEPARATOR .  $Data['dist']);
+            $this->Resurses[$BundleName]->setDist($this->Dist .  $Data['dist']);
         }
+    }
+    
+    public function generate() {
+        $Mix = new MiravelMix($this->Resurses, $this->Dist);
+        echo $Mix->generate();
     }
     
 }

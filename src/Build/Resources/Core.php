@@ -1,6 +1,8 @@
 <?php
 
-namespace Miravel\Buid;
+namespace Miravel\Buid\Resources;
+
+use Miravel\Buid\Resources\File;
 
 abstract class Core {
     
@@ -31,7 +33,7 @@ abstract class Core {
     }
     
     public function addFile(string $File) {
-        $this->Files[] = $File;
+        $this->Files[] = new File($File);
     }
     
     public function setDist(string $Dist){

@@ -41,5 +41,6 @@ class MiravelBuild extends Command
     {
         $Name = $this->argument('name');
         $Build = new Build($Name);
+        $Build->generate();
     }
 }
