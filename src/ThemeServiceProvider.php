@@ -104,7 +104,7 @@ class ThemeServiceProvider extends ServiceProvider
         ], 'config');
 
         $this->publishes([
-            $this->paths['themes'] => resource_path('views/vendor/miravel'),
+            $this->paths['themes'] => config('miravel.paths.app'),
         ], 'themes');
     }
 
