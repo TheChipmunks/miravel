@@ -374,6 +374,7 @@ class Theme
             return $this->parentTheme->getResource(
                 $name,
                 $extensions,
+                true,
                 $processedThemes
             );
         }
@@ -524,17 +525,17 @@ class Theme
     public function scan($relativePath, bool $ancestry = true)
     {
         $results = [];
-        $fs = new Filesystem;
+        $fs      = new Filesystem;
 
         foreach ($this->getPaths() as $type => $path) {
             $fullpath = $this->buildFilePath($relativePath, $type);
             $finder   = $this->getFinder();
             $finder->in($fullpath);
-            $objects = $finder->directories();
+            $objects  = $finder->directories();
 
             foreach ($objects as $object) {
-                $result = $object->getPathname;
-                $result = $fs->makePathRelative($result, $path);
+                $result    = $object->getPathname;
+                $result    = $fs->makePathRelative($result, $path);
                 $results[] = $result;
             }
         }
