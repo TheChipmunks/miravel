@@ -2,8 +2,8 @@
 
 namespace Miravel;
 
-use Miravel\Facade as MiravelFacade;
 use Illuminate\View\View;
+use Miravel\Facade as MiravelFacade;
 use Symfony\Component\Filesystem\Filesystem;
 
 class Utilities
@@ -373,7 +373,7 @@ class Utilities
         }
     }
 
-    protected static function htmlAttr($name, $value, $leadingSpace = false)
+    public static function htmlAttr($name, $value, $leadingSpace = false)
     {
         $output = sprintf('%s="%s"', $name, htmlspecialchars($value));
 
@@ -404,7 +404,7 @@ class Utilities
         return static::mbStrCmp($filename1, $filename2);
     }
 
-    protected static function mbStrCmp($str1, $str2)
+    public static function mbStrCmp($str1, $str2)
     {
         $encoding = mb_internal_encoding();
 

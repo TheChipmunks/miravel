@@ -2,13 +2,13 @@
 
 namespace Miravel;
 
-use Symfony\Component\Filesystem\Filesystem;
-use Miravel\Resources\BaseThemeResource;
-use Miravel\Factories\ResourceFactory;
-use Miravel\Factories\ElementFactory;
 use Miravel\Facade as MiravelFacade;
-use Symfony\Component\Finder\Finder;
+use Miravel\Factories\ElementFactory;
+use Miravel\Factories\ResourceFactory;
 use Miravel\Factories\ThemeFactory;
+use Miravel\Resources\BaseThemeResource;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Class Theme
@@ -499,7 +499,7 @@ class Theme
     ) {
         $paths = $resources = [];
 
-        $subset = $subset ? (array)$subset : static::getDefaultComponentSet();
+        $subset = $subset ? (array)$subset : ['']; // look, robot face!
 
         foreach ($subset as $relativePath) {
             $relativePath = Utilities::dotsToSlashes($relativePath);
@@ -516,11 +516,6 @@ class Theme
         }
 
         return $resources;
-    }
-
-    protected static function getDefaultComponentSet(): array
-    {
-        return ['elements', 'layouts', 'templates', 'skins'];
     }
 
     /**
@@ -540,27 +535,16 @@ class Theme
         bool $ancestry = true)
     {
         $results = [];
-        $fs      = new Filesystem;
 
-        foreach ($this->getPaths() as $type => $path) {
-            $fullpath = $this->buildFilePath($relativePath, $type);
-            $finder   = $this->getFinder();
-            $finder->in($fullpath);
-
-            switch ($filter) {
-                case self::RESOURCE_FILTER_FILES:
-                    $finder->files();
-                    break;
-                case self::RESOURCE_FILTER_DIRECTORIES:
-                    $finder->directories();
-                    break;
+        foreach ($this->getPaths() as $themepath) {
+            if (!$startingPath = $this->makeStartingPath($relativePath)){
+                continue;
             }
 
-            foreach ($finder as $object) {
-                $result    = $object->getPathname();
-                $result    = $fs->makePathRelative($result, $path);
-                $results[] = trim($result, '\/');
-            }
+            $results = array_merge(
+                $results,
+                $this->searchInPath($startingPath, $filter, $themepath)
+            );
         }
 
         if ($ancestry && $this->parentTheme) {
@@ -573,6 +557,54 @@ class Theme
         return array_unique($results);
     }
 
+    public function getFirstNonEmptyPath()
+    {
+        foreach ($this->paths as $path) {
+            if (!empty($path)) {
+                return $path;
+            }
+        }
+    }
+
+    protected function makeStartingPath(string $relativePath)
+    {
+        if (empty($relativePath) && $themepath = $this->getFirstNonEmptyPath()){
+            if ($resource = $this->makeResource($themepath)) {
+                return $resource->getRealPath();
+            }
+        }
+
+        if ($resource = $this->getResource($relativePath)) {
+            return $resource->getRealPath();
+        }
+    }
+
+    protected function searchInPath($fullpath, $filter, $rootpath): array
+    {
+        $results = [];
+        $fs      = new Filesystem;
+        $finder  = $this->getFinder();
+
+        $finder->in($fullpath);
+
+        switch ($filter) {
+            case self::RESOURCE_FILTER_FILES:
+                $finder->files();
+                break;
+            case self::RESOURCE_FILTER_DIRECTORIES:
+                $finder->directories();
+                break;
+        }
+
+        foreach ($finder as $object) {
+            $result    = $object->getPathname();
+            $result    = $fs->makePathRelative($result, $rootpath);
+            $results[] = trim($result, '\/');
+        }
+
+        return $results;
+    }
+
     protected function getFinder()
     {
         $finder = new Finder;
@@ -581,5 +613,20 @@ class Theme
                ->followLinks();
 
         return $finder;
+    }
+
+    public function getFileTree()
+    {
+        $tree      = [];
+        $resources = $this->getResourceList('', self::RESOURCE_FILTER_FILES);
+
+        foreach ($resources as $resource) {
+            $relativePath = $resource->getRelativePath();
+            $realPath     = $resource->getRealPath();
+
+            $tree[$relativePath] = $realPath;
+        }
+
+        return $tree;
     }
 }

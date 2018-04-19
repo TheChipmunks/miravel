@@ -21,6 +21,14 @@ class FileThemeResource extends BaseThemeResource
         }
     }
 
+
+    public function getCssSourceFile()
+    {
+        if ($this->isCssSourceFile()) {
+            return $this->getRealPath();
+        }
+    }
+
     public function isViewFile()
     {
         $basename = $this->getBasename();
@@ -44,5 +52,21 @@ class FileThemeResource extends BaseThemeResource
         $classFileName = MiravelFacade::getConfig('class_file_name');
 
         return Utilities::FileNameCmp($basename, $classFileName);
+    }
+
+    public function isCssSourceFile()
+    {
+        $ext = $this->getExtension();
+
+        // $possibleExts = MiravelFacade::getConfig('css_source_extensions');
+        $possibleExts = static::getPossibleCssSources();
+
+        foreach ($possibleExts as $possibleExt) {
+            if (Utilities::mbStrCmp($ext, $possibleExt)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

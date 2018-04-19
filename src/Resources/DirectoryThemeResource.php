@@ -7,7 +7,7 @@ use Miravel\Facade as MiravelFacade;
 class DirectoryThemeResource extends BaseThemeResource
 {
     /**
-     * @return FileThemeResource|void
+     * @return string|void
      */
     public function getClassFile()
     {
@@ -21,8 +21,8 @@ class DirectoryThemeResource extends BaseThemeResource
     }
 
     /**
-         * @return FileThemeResource|void
-         */
+     * @return string|void
+     */
     public function getViewFile()
     {
         $relativePath = $this->getRelativePathView();
@@ -35,6 +35,26 @@ class DirectoryThemeResource extends BaseThemeResource
 
         if ($resource) {
             return $resource->getRealPath();
+        }
+    }
+
+    /**
+     * @return string|void
+     */
+    public function getCssSourceFile()
+    {
+        $userPreferredSources = static::getUserPreferredCssSources();
+        $otherSources         = static::getRemainingCssSources();
+
+        $relativePath = $this->getRelativePathCssSource();
+
+        foreach ([$userPreferredSources, $otherSources] as $sourceSet) {
+            if ($resource = $this->getCallingTheme()->getResource(
+                $relativePath,
+                $sourceSet
+            )) {
+                return $resource->getRealPath();
+            };
         }
     }
 
@@ -59,4 +79,17 @@ class DirectoryThemeResource extends BaseThemeResource
             $classFileName
         ]);
     }
+
+    public function getRelativePathCssSource()
+    {
+        $relativePath  = $this->getRelativePath();
+        $styleFileName = MiravelFacade::getConfig('style_file_name');
+
+        return implode(DIRECTORY_SEPARATOR, [
+            $relativePath,
+            $styleFileName
+        ]);
+    }
+
+
 }

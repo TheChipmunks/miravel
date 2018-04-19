@@ -4,8 +4,8 @@ namespace Miravel\Resources;
 
 use Miravel\Exceptions\PathThemeAttributionException;
 use Miravel\Facade as MiravelFacade;
-use Miravel\Utilities;
 use Miravel\Theme;
+use Miravel\Utilities;
 use SplFileInfo;
 
 abstract class BaseThemeResource extends SplFileInfo
@@ -112,4 +112,27 @@ abstract class BaseThemeResource extends SplFileInfo
     abstract public function getViewFile();
 
     abstract public function getClassFile();
+
+    abstract public function getCssSourceFile();
+
+    public static function getPossibleCssSources()
+    {
+        return ['scss', 'sass', 'less', 'styl', 'css'];
+    }
+
+    public static function getUserPreferredCssSources()
+    {
+        $possibleSources = static::getPossibleCssSources();
+        $config          = MiravelFacade::getConfig('css_source_extensions');
+
+        return array_unique(array_intersect($config, $possibleSources));
+    }
+
+    public static function getRemainingCssSources()
+    {
+        $possibleSources = static::getPossibleCssSources();
+        $config          = MiravelFacade::getConfig('css_source_extensions');
+
+        return array_unique(array_diff($possibleSources, $config));
+    }
 }

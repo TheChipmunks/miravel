@@ -20,8 +20,11 @@ return [
     ],
 
     'template_file_extensions' => ['php', 'blade.php', 'phtml'],
+    'css_source_extensions'    => ['scss', 'sass', 'less', 'styl', 'css'],
     'template_file_name'       => 'view',
+    'style_file_name'          => 'style',
     'class_file_name'          => 'class.php',
+
 
     'blade_directive_map' => [
 
