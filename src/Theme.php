@@ -23,6 +23,10 @@ class Theme
     // inside theme directory.
     const CONFIG_FILE_NAME = 'config.php';
 
+    const RESOURCE_FILTER_DIRECTORIES = 'dirs';
+    const RESOURCE_FILTER_FILES       = 'files';
+    const RESOURCE_FILTER_ALL         = 'all';
+
     /**
      * @var string
      */
@@ -477,25 +481,35 @@ class Theme
     }
 
     /**
-     * Get the flat list of relative paths of all directory resources within the
-     * theme folder (including parent themes).
+     * Get the flat list of all matching resources within the theme folder
+     * (including parent themes).
      *
      * @param null $subset    Restrict to certain subdirectories, e.g. 'elements'
      *                        or ['elements', 'layouts']
+     * @param string $filter  Whether to include file resources, directory resources,
+     *                        or both
      * @param bool $ancestry  Whether to search in parent themes
      *
-     * @return array          An array with relative paths
+     * @return array          An array with resource objects
      */
-    public function getDirectoryResources($subset = null, bool $ancestry = true)
-    {
+    public function getResourceList(
+        $subset = null,
+        $filter = self::RESOURCE_FILTER_ALL,
+        bool $ancestry = true
+    ) {
         $paths = $resources = [];
 
         $subset = $subset ? (array)$subset : static::getDefaultComponentSet();
 
         foreach ($subset as $relativePath) {
             $relativePath = Utilities::dotsToSlashes($relativePath);
-            $paths = array_merge($paths, $this->scan($relativePath, $ancestry));
+            $paths = array_merge(
+                $paths,
+                $this->scan($relativePath, $filter, $ancestry)
+            );
         }
+
+        $paths = array_unique($paths);
 
         foreach ($paths as $relativePath) {
             $resources[] = $this->getResource($relativePath);
@@ -509,7 +523,21 @@ class Theme
         return ['elements', 'layouts', 'templates', 'skins'];
     }
 
-    public function scan($relativePath = '', bool $ancestry = true)
+    /**
+     * Get the flat list of relative paths matching the given criteria
+     * (including parent themes).
+     *
+     * @param string $relativePath  The relative path that is the subtree root
+     *                              to start searching in.
+     * @param string $filter        Whether to pick files, directories, or both
+     * @param bool $ancestry        Whether to search in parent themes
+     *
+     * @return array                An array with relative paths
+     */
+    public function scan(
+        $relativePath = '',
+        $filter = self::RESOURCE_FILTER_ALL,
+        bool $ancestry = true)
     {
         $results = [];
         $fs      = new Filesystem;
@@ -518,9 +546,17 @@ class Theme
             $fullpath = $this->buildFilePath($relativePath, $type);
             $finder   = $this->getFinder();
             $finder->in($fullpath);
-            $objects  = $finder->directories();
 
-            foreach ($objects as $object) {
+            switch ($filter) {
+                case self::RESOURCE_FILTER_FILES:
+                    $finder->files();
+                    break;
+                case self::RESOURCE_FILTER_DIRECTORIES:
+                    $finder->directories();
+                    break;
+            }
+
+            foreach ($finder as $object) {
                 $result    = $object->getPathname();
                 $result    = $fs->makePathRelative($result, $path);
                 $results[] = trim($result, '\/');
@@ -539,6 +575,10 @@ class Theme
 
     protected function getFinder()
     {
-        return new Finder;
+        $finder = new Finder;
+
+        $finder->ignoreUnreadableDirs()
+               ->ignoreDotFiles()
+               ->ignoreVCS();
     }
 }
