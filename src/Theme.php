@@ -2,10 +2,12 @@
 
 namespace Miravel;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Miravel\Resources\BaseThemeResource;
 use Miravel\Factories\ResourceFactory;
 use Miravel\Factories\ElementFactory;
 use Miravel\Facade as MiravelFacade;
+use Symfony\Component\Finder\Finder;
 use Miravel\Factories\ThemeFactory;
 
 /**
@@ -295,8 +297,8 @@ class Theme
     {
         if (isset($this->paths[$path])) {
             return implode(DIRECTORY_SEPARATOR, [
-                $this->paths[$path],
-                $filename
+                rtrim($this->paths[$path], '\/'),
+                ltrim($filename, '\/')
             ]);
         }
     }
@@ -307,23 +309,35 @@ class Theme
      *
      * The lookup is done in this theme and its parent hierarchy, if any.
      *
-     * @param string $name                  a file path e.g. 'layouts/basic/style.css'
+     * @param string $name                  A file path e.g. 'layouts/basic/style.css'
      *                                      OR a dot definition e.g. 'elements.grid'
-     * @param array $extensions             an array of file extensions to try
-     * @param array $processedThemes        global list of themes that have already
-     *                                      been processed during current lookup
+     * @param array $extensions             An array of file extensions to try
+     * @param bool $ancestry                Whether to search in parent themes
+     * @param array $processedThemes        Static list of themes that have already
+     *                                      been processed during this call
      *
-     * @return null|BaseThemeResource|void  resource object containing the path
+     * @return null|BaseThemeResource|void  Resource object containing the path
      *                                      to the file or directory
      */
     public function getResource(
         string $name,
         array $extensions = [],
+        bool $ancestry = true,
         array $processedThemes = []
     ) {
         // global list is used to prevent infinite loop on circular reference
         // e.g. when 2 themes extend each other
         if (in_array($this->name, $processedThemes)) {
+            return;
+        }
+
+        if ($path = $this->lookupResource($name, $extensions)) {
+            // found in this theme
+            return $this->makeResource($path);
+        }
+
+        if (!$ancestry) {
+            // explicit prohibition to look up parents
             return;
         }
 
@@ -353,12 +367,7 @@ class Theme
         array $extensions,
         array &$processedThemes
     ) {
-        if ($path = $this->lookupResource($name, $extensions)) {
-
-            // found in this theme
-            return $this->makeResource($path);
-
-        } elseif ($this->parentTheme) {
+         if ($this->parentTheme) {
 
             // look in parent themes, if any
             $processedThemes[] = $this->name;
@@ -375,16 +384,18 @@ class Theme
      * for the template file in that directory; if missing, will continue search
      * in parent themes.
      *
-     * @param string $name            the resource name to resolve.
-     * @param array $processedThemes  an array of theme names that have already
+     * @param string $name            The resource name to resolve.
+     * @param bool $ancestry          Whether to look in parent themes
+     * @param array $processedThemes  An array of theme names that have already
      *                                been processed in the current cycle, to
      *                                avoid infinite loop.
      *
-     * @return null|string            absolute path to the view file, or null if
+     * @return null|string            Absolute path to the view file, or null if
      *                                such a file is not found.
      */
     public function getViewFile(
         string $name,
+        bool $ancestry = true,
         array $processedThemes = []
     ) {
         // global list is used to prevent infinite loop on circular reference
@@ -393,7 +404,7 @@ class Theme
             return;
         }
 
-        if ($resource = $this->getResource($name)) {
+        if ($resource = $this->getResource($name, [], $ancestry)) {
             return $resource->getViewFile();
         }
     }
@@ -477,5 +488,66 @@ class Theme
         );
     }
 
+    /**
+     * Get the flat list of relative paths of all directory resources within the
+     * theme folder (including parent themes).
+     *
+     * @param null $subset    Restrict to certain subdirectories, e.g. 'elements'
+     *                        or ['elements', 'layouts']
+     * @param bool $ancestry  Whether to search in parent themes
+     *
+     * @return array          An array with relative paths
+     */
+    public function getDirectoryResources($subset = null, bool $ancestry = true)
+    {
+        $paths = $resources = [];
 
+        $subset = $subset ? (array)$subset : static::getDefaultSubset();
+
+        foreach ($subset as $relativePath) {
+            $relativePath = Utilities::dotsToSlashes($relativePath);
+            $paths += $this->scan($relativePath, $ancestry);
+        }
+
+        foreach ($paths as $relativePath) {
+            $resources[] = $this->getResource($relativePath);
+        }
+
+        return $resources;
+    }
+
+    protected static function getDefaultSubset(): array
+    {
+        return ['elements', 'layouts', 'templates', 'skins'];
+    }
+
+    public function scan($relativePath, bool $ancestry = true)
+    {
+        $results = [];
+        $fs = new Filesystem;
+
+        foreach ($this->getPaths() as $type => $path) {
+            $fullpath = $this->buildFilePath($relativePath, $type);
+            $finder   = $this->getFinder();
+            $finder->in($fullpath);
+            $objects = $finder->directories();
+
+            foreach ($objects as $object) {
+                $result = $object->getPathname;
+                $result = $fs->makePathRelative($result, $path);
+                $results[] = $result;
+            }
+        }
+
+        if ($ancestry && $this->parentTheme) {
+            $results += $this->parentTheme->scan($relativePath);
+        }
+
+        return array_unique($results);
+    }
+
+    protected function getFinder()
+    {
+        return new Finder;
+    }
 }

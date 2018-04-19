@@ -10,7 +10,9 @@
         }
     ],
     "require": {
-        "php": "^7.0"
+        "php": "^7.0",
+        "symfony/finder": ">=2.6",
+        "symfony/filesystem": ">=2.6"
     },
     "require-dev": {
         "laravel/framework": ">=5.0"
