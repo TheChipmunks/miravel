@@ -139,25 +139,12 @@ class Theme
     public static function getThemeDirPaths(): array
     {
         if (is_null(static::$themeDirPaths)) {
-            $hints  = app()->make('view.finder')->getHints();
-            $result = [];
+            $paths = [
+                'app'    => MiravelFacade::getConfig('paths.app'),
+                'vendor' => MiravelFacade::getConfig('paths.vendor'),
+            ];
 
-            if (isset($hints['miravel']) && is_array($hints['miravel'])) {
-                foreach ($hints['miravel'] as $hint) {
-                    $realpath = realpath($hint);
-
-                    if (Utilities::isResourceViewPath($realpath)) {
-                        $result['app'] = $realpath;
-                    } elseif (Utilities::isVendorPackagePath($realpath)) {
-                        $result['vendor'] = $realpath;
-                    }
-                }
-            }
-
-            // make sure app is always first
-            ksort($result);
-
-            static::$themeDirPaths = $result;
+            static::$themeDirPaths = $paths;
         }
 
         return static::$themeDirPaths;
