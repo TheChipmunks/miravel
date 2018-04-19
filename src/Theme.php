@@ -490,11 +490,11 @@ class Theme
     {
         $paths = $resources = [];
 
-        $subset = $subset ? (array)$subset : static::getDefaultSubset();
+        $subset = $subset ? (array)$subset : static::getDefaultComponentSet();
 
         foreach ($subset as $relativePath) {
             $relativePath = Utilities::dotsToSlashes($relativePath);
-            $paths += $this->scan($relativePath, $ancestry);
+            $paths = array_merge($paths, $this->scan($relativePath, $ancestry));
         }
 
         foreach ($paths as $relativePath) {
@@ -504,12 +504,12 @@ class Theme
         return $resources;
     }
 
-    protected static function getDefaultSubset(): array
+    protected static function getDefaultComponentSet(): array
     {
         return ['elements', 'layouts', 'templates', 'skins'];
     }
 
-    public function scan($relativePath, bool $ancestry = true)
+    public function scan($relativePath = '', bool $ancestry = true)
     {
         $results = [];
         $fs      = new Filesystem;
@@ -523,12 +523,15 @@ class Theme
             foreach ($objects as $object) {
                 $result    = $object->getPathname();
                 $result    = $fs->makePathRelative($result, $path);
-                $results[] = $result;
+                $results[] = trim($result, '\/');
             }
         }
 
         if ($ancestry && $this->parentTheme) {
-            $results += $this->parentTheme->scan($relativePath);
+            $results = array_merge(
+                $results,
+                $this->parentTheme->scan($relativePath)
+            );
         }
 
         return array_unique($results);
