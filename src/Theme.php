@@ -140,8 +140,8 @@ class Theme
     {
         if (is_null(static::$themeDirPaths)) {
             $paths = [
-                'app'    => MiravelFacade::getConfig('paths.app'),
-                'vendor' => MiravelFacade::getConfig('paths.vendor'),
+                'app'    => realpath(MiravelFacade::getConfig('paths.app')),
+                'vendor' => realpath(MiravelFacade::getConfig('paths.vendor')),
             ];
 
             static::$themeDirPaths = $paths;
