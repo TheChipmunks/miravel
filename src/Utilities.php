@@ -4,6 +4,7 @@ namespace Miravel;
 
 use Miravel\Facade as MiravelFacade;
 use Illuminate\View\View;
+use Symfony\Component\Filesystem\Filesystem;
 
 class Utilities
 {
@@ -215,8 +216,13 @@ class Utilities
     public static function getPathComponents(string $path)
     {
         $lookupPaths = Theme::getThemeDirPaths();
+        $fs          = new Filesystem;
 
         foreach ($lookupPaths as $lookupPath) {
+            if (!$lookupPath || !$fs->isAbsolutePath($lookupPath)) {
+                continue;
+            }
+
             $lookupPath = realpath($lookupPath);
             if (0 !== strpos($path, $lookupPath)) {
                 continue;
@@ -275,9 +281,9 @@ class Utilities
 
     public static function isAbsolutePath($path)
     {
-        return static::isWin() ?
-            preg_match('/^[a-z]:/i', $path) :
-            0 === strpos($path, '/');
+        $fs = new Filesystem;
+
+        return $fs->isAbsolutePath($path);
     }
 
     public static function isWin()
