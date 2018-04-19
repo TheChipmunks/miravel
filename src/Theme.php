@@ -2,13 +2,13 @@
 
 namespace Miravel;
 
-use Miravel\Facade as MiravelFacade;
-use Miravel\Factories\ElementFactory;
-use Miravel\Factories\ResourceFactory;
-use Miravel\Factories\ThemeFactory;
-use Miravel\Resources\BaseThemeResource;
 use Symfony\Component\Filesystem\Filesystem;
+use Miravel\Resources\BaseThemeResource;
+use Miravel\Factories\ResourceFactory;
+use Miravel\Factories\ElementFactory;
+use Miravel\Facade as MiravelFacade;
 use Symfony\Component\Finder\Finder;
+use Miravel\Factories\ThemeFactory;
 
 /**
  * Class Theme
@@ -615,7 +615,7 @@ class Theme
         return $finder;
     }
 
-    public function getFileTree()
+    public function getFileList()
     {
         $tree      = [];
         $resources = $this->getResourceList('', self::RESOURCE_FILTER_FILES);
