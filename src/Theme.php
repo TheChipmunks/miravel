@@ -534,7 +534,7 @@ class Theme
             $objects  = $finder->directories();
 
             foreach ($objects as $object) {
-                $result    = $object->getPathname;
+                $result    = $object->getPathname();
                 $result    = $fs->makePathRelative($result, $path);
                 $results[] = $result;
             }
