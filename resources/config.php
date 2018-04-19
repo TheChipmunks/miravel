@@ -82,13 +82,13 @@ return [
     ],
 
     'paths' => [
-        'vendor' => base_path('vendor/miravel/miravel/resources/themes'),
-        'app'    => resource_path('themes'),
+        'vendor'  => base_path('vendor/miravel/miravel/resources/themes'),
+        'app'     => resource_path('themes'),
 
-        'public' => public_path('miravel'),
-        'views'  => resource_path('views'),
-        'dist'   => storage_path('miravel'),
+        'public'  => public_path('miravel'),
+        'views'   => resource_path('views'),
+        'storage' => storage_path('miravel'),
 
-        'web'    => '/miravel',
+        'web'     => '/miravel',
     ],
 ];

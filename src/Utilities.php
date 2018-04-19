@@ -373,8 +373,11 @@ class Utilities
         }
     }
 
-    public static function htmlAttr($name, $value, $leadingSpace = false)
-    {
+    public static function htmlAttr(
+        string $name,
+        string $value,
+        bool $leadingSpace = false
+    ) {
         $output = sprintf('%s="%s"', $name, htmlspecialchars($value));
 
         if ($leadingSpace) {
@@ -395,7 +398,7 @@ class Utilities
      * @return bool  true if file names are equal in terms of filesystem, false
      *               otherwise.
      */
-    public static function FileNameCmp($filename1, $filename2)
+    public static function FileNameCmp(string $filename1, string $filename2)
     {
         if (!static::isWin()) {
             return strcmp($filename1, $filename2) ? false : true;
@@ -404,7 +407,7 @@ class Utilities
         return static::mbStrCmp($filename1, $filename2);
     }
 
-    public static function mbStrCmp($str1, $str2)
+    public static function mbStrCmp(string $str1, string $str2)
     {
         $encoding = mb_internal_encoding();
 
@@ -412,5 +415,26 @@ class Utilities
         $str2 = mb_strtoupper($str2, $encoding);
 
         return strcmp($str1, $str2) ? false : true;
+    }
+
+    public static function pathBelongsTo(string $path, string $parent)
+    {
+        $path   = realpath($path);
+        $parent = realpath($parent);
+
+        return (strlen($path) >= strlen($parent)) &&
+               (0 === strpos($path, $parent));
+    }
+
+    public static function purgePath(string $path)
+    {
+        $fs = new Filesystem;
+        $fs->remove($path);
+    }
+
+    public static function mkdir(string $path)
+    {
+        $fs = new Filesystem;
+        $fs->mkdir($path, 0644);
     }
 }

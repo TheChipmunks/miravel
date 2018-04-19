@@ -345,4 +345,51 @@ class Miravel
         return $this->getCurrentViewParentTheme();
     }
 
+    public function getStoragePath()
+    {
+        return $this->getConfig(
+            'paths.storage',
+            storage_path('miravel')
+        );
+    }
+
+    public function getVendorPath()
+    {
+        return $this->getConfig(
+            'paths.vendor',
+            base_path('vendor/miravel/miravel/resources/themes')
+        );
+    }
+
+    public function getAppPath()
+    {
+        return $this->getConfig(
+            'paths.app',
+            resource_path('themes')
+        );
+    }
+
+    public function getPublicPath()
+    {
+        return $this->getConfig(
+            'paths.public',
+            public_path('miravel')
+        );
+    }
+
+    public function getViewsPath()
+    {
+        return $this->getConfig(
+            'paths.views',
+            resource_path('views')
+        );
+    }
+
+    public function getWebPath()
+    {
+        return $this->getConfig(
+            'paths.web',
+            '/miravel'
+        );
+    }
 }

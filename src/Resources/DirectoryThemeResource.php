@@ -90,6 +90,4 @@ class DirectoryThemeResource extends BaseThemeResource
             $styleFileName
         ]);
     }
-
-
 }

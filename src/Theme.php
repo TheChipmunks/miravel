@@ -2,13 +2,16 @@
 
 namespace Miravel;
 
+use Miravel\Exceptions\PathPurgeSafeCheckException;
 use Symfony\Component\Filesystem\Filesystem;
+use Miravel\Exceptions\PathPurgeException;
 use Miravel\Resources\BaseThemeResource;
 use Miravel\Factories\ResourceFactory;
 use Miravel\Factories\ElementFactory;
 use Miravel\Facade as MiravelFacade;
 use Symfony\Component\Finder\Finder;
 use Miravel\Factories\ThemeFactory;
+use Exception;
 
 /**
  * Class Theme
@@ -615,10 +618,24 @@ class Theme
         return $finder;
     }
 
-    public function getFileList()
+    /**
+     * Get all theme files as flat array, where keys are the relative paths, and
+     * values are the paths to the source files, wherever those might reside in
+     * theme hierarchy.
+     *
+     * @param bool $ancestry  Whether to look in parent themes
+     *
+     * @return array
+     */
+    public function getFileList(bool $ancestry = true)
     {
         $tree      = [];
-        $resources = $this->getResourceList('', self::RESOURCE_FILTER_FILES);
+
+        $resources = $this->getResourceList(
+            '',
+            self::RESOURCE_FILTER_FILES,
+            $ancestry
+        );
 
         foreach ($resources as $resource) {
             $relativePath = $resource->getRelativePath();
@@ -628,5 +645,71 @@ class Theme
         }
 
         return $tree;
+    }
+
+    /**
+     * Collect all theme files from the multitude of possible theme locations
+     * and from parent themes.
+     *
+     * @param string $destination  Path where to send the files. Default is the
+     *                             config('miravel.paths.storage')/theme-name
+     */
+    public function dumpFileTree(string $destination = null, bool $ancestry = true)
+    {
+        if (!$destination) {
+            $destination = $this->getDefaultThemeDumpPath();
+        }
+
+        $this->prepareDestinationDirectory($destination);
+
+        $files = $this->getFileList($ancestry);
+        $fs    = new Filesystem;
+
+        try {
+            foreach ($files as $relativePath => $source) {
+                $dest = implode(DIRECTORY_SEPARATOR, [
+                    $destination,
+                    $relativePath,
+                ]);
+
+                $fs->copy($source, $dest);
+            }
+        } catch (Exception $e) {
+            MiravelFacade::exception(ThemeDumpException::class, ['file' => $source, 'dest' => $dest], __FILE__, __LINE__);
+        }
+    }
+
+    protected function prepareDestinationDirectory(string $path, bool $safeCheckOff = false)
+    {
+        if (!$safeCheckOff && !$this->safeCheck($path)) {
+            MiravelFacade::exception(PathPurgeSafeCheckException::class, compact('path'), __FILE__, __LINE__);
+        }
+
+        try {
+            $this->purge($path);
+            Utilities::mkdir($path);
+        } catch (Exception $exception) {
+            MiravelFacade::exception(PathPurgeException::class, compact('path'), __FILE__, __LINE__);
+        }
+    }
+
+    protected function safeCheck(string $path)
+    {
+        $safedir = MiravelFacade::getStoragePath();
+
+        return Utilities::pathBelongsTo($path, $safedir);
+    }
+
+    protected function purge(string $path)
+    {
+        return Utilities::purgePath($path);
+    }
+
+    protected function getDefaultThemeDumpPath()
+    {
+        return implode(DIRECTORY_SEPARATOR, [
+            MiravelFacade::getStoragePath(),
+            $this->getName()
+        ]);
     }
 }
