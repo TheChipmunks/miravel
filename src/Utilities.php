@@ -2,9 +2,9 @@
 
 namespace Miravel;
 
-use Illuminate\View\View;
-use Miravel\Facade as MiravelFacade;
 use Symfony\Component\Filesystem\Filesystem;
+use Miravel\Facade as MiravelFacade;
+use Illuminate\View\View;
 
 class Utilities
 {

@@ -2,11 +2,11 @@
 
 namespace Miravel\Factories;
 
-use Miravel\Exceptions\PathNotFoundException;
 use Miravel\Exceptions\UnknownResourceFstypeException;
-use Miravel\Facade as MiravelFacade;
+use Miravel\Exceptions\PathNotFoundException;
 use Miravel\Resources\DirectoryThemeResource;
 use Miravel\Resources\FileThemeResource;
+use Miravel\Facade as MiravelFacade;
 
 class ResourceFactory
 {

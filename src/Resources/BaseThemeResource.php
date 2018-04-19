@@ -4,8 +4,8 @@ namespace Miravel\Resources;
 
 use Miravel\Exceptions\PathThemeAttributionException;
 use Miravel\Facade as MiravelFacade;
-use Miravel\Theme;
 use Miravel\Utilities;
+use Miravel\Theme;
 use SplFileInfo;
 
 abstract class BaseThemeResource extends SplFileInfo
