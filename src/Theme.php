@@ -566,7 +566,7 @@ class Theme
         if ($ancestry && $this->parentTheme) {
             $results = array_merge(
                 $results,
-                $this->parentTheme->scan($relativePath)
+                $this->parentTheme->scan($relativePath, $filter)
             );
         }
 
