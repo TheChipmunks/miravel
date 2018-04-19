@@ -578,7 +578,8 @@ class Theme
         $finder = new Finder;
 
         $finder->ignoreUnreadableDirs()
-               ->followLinks()
-               ->ignoreDotFiles();
+               ->followLinks();
+
+        return $finder;
     }
 }
