@@ -40,7 +40,7 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
     /**
      * @var array
      */
-    public $extensionList = ['scss', 'sass', 'less', 'styl', 'css', 'es5', 'es6', 'js'];
+    public $extensionList = ['scss', 'sass', 'less', 'styl', 'css', 'es5', 'es6', 'js', 'json'];
 
     /**
      * This builder only needs specific file types
@@ -106,7 +106,7 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
 
         // $result = $this->runCliCommand($command);
 
-        $this->report('Running the main build command...');
+        $this->report(sprintf('Running %s', $command));
 
         // if (!$result->isSuccessful()) {
         //     $this->reportBuildErrors($result);
