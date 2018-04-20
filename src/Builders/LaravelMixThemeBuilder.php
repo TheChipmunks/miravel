@@ -98,11 +98,15 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
     {
         $command = $this->getBuildCommand();
 
-        $result = $this->runCliCommand($command);
+        // $result = $this->runCliCommand($command);
 
-        if (!$result->isSuccessful()) {
+        $this->report('Running the main build command...');
 
-        }
+        // if (!$result->isSuccessful()) {
+        //     $this->reportBuildErrors($result);
+        // } else {
+        //     $this->reportBuildSuccess($result);
+        // }
     }
 
     public function getMixFileName(): string
@@ -121,7 +125,7 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
     public function getMixFilePath()
     {
         $buildDir = $this->getBuildDirectory();
-        $mixfile  = $this->getDefaultMixFileName();
+        $mixfile  = $this->getMixFileName();
 
         return implode(DIRECTORY_SEPARATOR, [$buildDir, $mixfile]);
     }
