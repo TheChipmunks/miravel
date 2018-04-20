@@ -2,9 +2,9 @@
 
 namespace Miravel;
 
+use Miravel\Exceptions\PathPurgeSafeCheckException;
 use Miravel\Builders\LaravelMixThemeBuilder;
 use Miravel\Builders\ThemeBuilderInterface;
-use Miravel\Exceptions\PathPurgeSafeCheckException;
 use Miravel\Exceptions\PathPurgeException;
 use Miravel\Resources\BaseThemeResource;
 use Miravel\Factories\ResourceFactory;
