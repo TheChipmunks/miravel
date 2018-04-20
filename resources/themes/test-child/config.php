@@ -10,9 +10,6 @@ return [
             'main-style' => [
                 'src' => [
                     'assets/src/style.scss',
-
-                    // all elements from this theme and those inherited from parent themes
-                    'elements'
                 ],
 
                 // will place the result file to storage/miravel/build/test-child/assets/dist/style.css
@@ -26,9 +23,6 @@ return [
             'main-script' => [
                 'src' => [
                     'assets/src/script.js',
-
-                    // all elements from this theme and those inherited from parent themes
-                    'elements'
                 ],
 
                 // will place the result file to storage/miravel/build/test-child/assets/dist/script.js

@@ -9,9 +9,6 @@ return [
                 'src' => [
                     // theme main js file
                     'assets/src/style.scss',
-
-                    // all elements from this theme
-                    'elements'
                 ],
 
                 // will place the result file to storage/miravel/build/test-parent/assets/dist/style.css
@@ -26,9 +23,6 @@ return [
                 'src' => [
                     // theme main js file
                     'assets/src/script.js',
-
-                    // all elements from this theme
-                    'elements'
                 ],
 
                 // will place the result file to storage/miravel/build/test-parent/assets/dist/script.js
