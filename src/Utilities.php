@@ -433,13 +433,22 @@ class Utilities
                (0 === strpos($path, $parent));
     }
 
+    public static function getFilesystem()
+    {
+        if (!static::$fs) {
+            static::$fs = new Filesystem;
+        }
+
+        return static::$fs;
+    }
+
     public static function purgePath(string $path)
     {
         $fs = static::getFilesystem();
         $fs->remove($path);
     }
 
-    public static function mkdir(string $path, int $mode = 0644)
+    public static function mkdir(string $path, int $mode = 0755)
     {
         $fs = static::getFilesystem();
         $fs->mkdir($path, $mode);
@@ -449,14 +458,5 @@ class Utilities
     {
         $fs = static::getFilesystem();
         return $fs->exists($path);
-    }
-
-    public static function getFilesystem()
-    {
-        if (!static::$fs) {
-            static::$fs = new Filesystem;
-        }
-
-        return static::$fs;
     }
 }

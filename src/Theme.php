@@ -12,6 +12,7 @@ use Miravel\Factories\ElementFactory;
 use Miravel\Facade as MiravelFacade;
 use Symfony\Component\Finder\Finder;
 use Miravel\Factories\ThemeFactory;
+use Illuminate\Console\Command;
 use Exception;
 
 /**
@@ -744,7 +745,7 @@ class Theme
         Utilities::mkdir($path);
     }
 
-    public function getDefaultThemeDumpPath()
+    public function getDefaultThemeDumpPath(): string
     {
         return implode(DIRECTORY_SEPARATOR, [
             MiravelFacade::getStoragePath(),
@@ -754,10 +755,16 @@ class Theme
 
     /**
      * Build the theme
+     *
+     * @param Command|null $command
      */
-    public function build()
+    public function build(Command $command = null)
     {
         $builder = $this->makeBuilder();
+
+        if ($command) {
+            $builder->setCli($command);
+        }
 
         $builder->build();
     }

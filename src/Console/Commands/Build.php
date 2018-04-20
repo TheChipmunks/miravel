@@ -2,6 +2,8 @@
 
 namespace Miravel\Console\Commands;
 
+use Miravel\Exceptions\ThemeNotFoundException;
+use Miravel\Facade as MiravelFacade;
 use Illuminate\Console\Command;
 
 class BuildCommand extends Command
@@ -11,7 +13,7 @@ class BuildCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'miravel:build';
+    protected $signature = 'miravel:build {theme} {--publish}';
 
     /**
      * The console command description.
@@ -37,6 +39,16 @@ class BuildCommand extends Command
      */
     public function handle()
     {
-        //
+        $name = $this->argument('theme');
+
+        if (!$theme = MiravelFacade::makeAndValidateTheme($name)) {
+            MiravelFacade::exception(ThemeNotFoundException::class, ['theme' => $name], __FILE__, __LINE__);
+        }
+
+        $theme->build();
+
+        // if ($this->option('publish')) {
+        //     $theme->publish();
+        // }
     }
 }
