@@ -2,6 +2,8 @@
 
 namespace Miravel;
 
+use Miravel\Builders\LaravelMixThemeBuilder;
+use Miravel\Builders\ThemeBuilderInterface;
 use Miravel\Exceptions\PathPurgeSafeCheckException;
 use Symfony\Component\Filesystem\Filesystem;
 use Miravel\Exceptions\PathPurgeException;
@@ -487,18 +489,21 @@ class Theme
      * Get the flat list of all matching resources within the theme folder
      * (including parent themes).
      *
-     * @param null $subset    Restrict to certain subdirectories, e.g. 'elements'
-     *                        or ['elements', 'layouts']
-     * @param string $filter  Whether to include file resources, directory resources,
-     *                        or both
-     * @param bool $ancestry  Whether to search in parent themes
+     * @param null $subset                   Restrict to certain subdirectories, e.g. 'elements'
+     *                                       or ['elements', 'layouts']
+     * @param string $filter                 Whether to include file resources, directory resources,
+     *                                       or both
+     * @param bool $ancestry                 Whether to search in parent themes
      *
-     * @return array          An array with resource objects
+     * @param callable|null $finderModifier
+     *
+     * @return array                         An array with resource objects
      */
     public function getResourceList(
         $subset = null,
         $filter = self::RESOURCE_FILTER_ALL,
-        bool $ancestry = true
+        bool $ancestry = true,
+        callable $finderModifier = null
     ) {
         $paths = $resources = [];
 
@@ -508,7 +513,7 @@ class Theme
             $relativePath = Utilities::dotsToSlashes($relativePath);
             $paths = array_merge(
                 $paths,
-                $this->scan($relativePath, $filter, $ancestry)
+                $this->scan($relativePath, $filter, $ancestry, $finderModifier)
             );
         }
 
@@ -525,18 +530,21 @@ class Theme
      * Get the flat list of relative paths matching the given criteria
      * (including parent themes).
      *
-     * @param string $relativePath  The relative path that is the subtree root
-     *                              to start searching in.
-     * @param string $filter        Whether to pick files, directories, or both
-     * @param bool $ancestry        Whether to search in parent themes
+     * @param string $relativePath           The relative path that is the subtree root
+     *                                       to start searching in.
+     * @param string $filter                 Whether to pick files, directories, or both
+     * @param bool $ancestry                 Whether to search in parent themes
+     * @param callable|null $finderModifier  Function to call on finder, used to apply
+     *                                       any filter (like *.css) before copying files
      *
-     * @return array                An array with relative paths
+     * @return array                         An array with relative paths
      */
     public function scan(
         $relativePath = '',
         $filter = self::RESOURCE_FILTER_ALL,
-        bool $ancestry = true)
-    {
+        bool $ancestry = true,
+        callable $finderModifier = null
+    ) {
         $results = [];
 
         foreach ($this->getPaths() as $themepath) {
@@ -546,7 +554,12 @@ class Theme
 
             $results = array_merge(
                 $results,
-                $this->searchInPath($startingPath, $filter, $themepath)
+                $this->searchInPath(
+                    $startingPath,
+                    $filter,
+                    $themepath,
+                    $finderModifier
+                )
             );
         }
 
@@ -582,11 +595,15 @@ class Theme
         }
     }
 
-    protected function searchInPath($fullpath, $filter, $rootpath): array
-    {
+    protected function searchInPath(
+        $fullpath,
+        $filter,
+        $rootpath,
+        callable $finderModifier = null
+    ): array {
         $results = [];
         $fs      = new Filesystem;
-        $finder  = $this->getFinder();
+        $finder  = $this->getFinder($finderModifier);
 
         $finder->in($fullpath);
 
@@ -608,12 +625,25 @@ class Theme
         return $results;
     }
 
-    protected function getFinder()
+    /**
+     * Initialize the Finder object to search for files and folders in a certain
+     * directory
+     *
+     * @param callable|null $modifier  Optional function that allows to set
+     *                                 additional criteria on the finder
+     *
+     * @return Finder
+     */
+    protected function getFinder(callable $modifier = null)
     {
         $finder = new Finder;
 
         $finder->ignoreUnreadableDirs()
                ->followLinks();
+
+        if ($modifier) {
+            $modifier($finder);
+        }
 
         return $finder;
     }
@@ -623,18 +653,24 @@ class Theme
      * values are the paths to the source files, wherever those might reside in
      * theme hierarchy.
      *
-     * @param bool $ancestry  Whether to look in parent themes
+     * @param bool $ancestry                 Whether to look in parent themes
+     *
+     * @param callable|null $finderModifier  Function to call on finder, used to apply
+     *                                       any filter (like *.css) before copying files
      *
      * @return array
      */
-    public function getFileList(bool $ancestry = true)
-    {
-        $tree      = [];
+    public function getFileList(
+        bool $ancestry = true,
+        callable $finderModifier = null
+    ) {
+        $tree = [];
 
         $resources = $this->getResourceList(
             '',
             self::RESOURCE_FILTER_FILES,
-            $ancestry
+            $ancestry,
+            $finderModifier
         );
 
         foreach ($resources as $resource) {
@@ -651,18 +687,24 @@ class Theme
      * Collect all theme files from the multitude of possible theme locations
      * and from parent themes.
      *
-     * @param string $destination  Path where to send the files. Default is the
-     *                             config('miravel.paths.storage')/theme-name
+     * @param string $destination            Path where to send the files. Default is the
+     *                                       config('miravel.paths.storage')/theme-name
+     * @param bool $ancestry                 Whether to look in parent themes
+     * @param callable|null $finderModifier  Function to call on finder, useful for applying
+     *                                       additional filters (like *.css) before copying files
      */
-    public function dumpFileTree(string $destination = null, bool $ancestry = true)
-    {
+    public function dumpFileTree(
+        string $destination = null,
+        bool $ancestry = true,
+        callable $finderModifier = null
+    ) {
         if (!$destination) {
             $destination = $this->getDefaultThemeDumpPath();
         }
 
         $this->prepareDestinationDirectory($destination);
 
-        $files = $this->getFileList($ancestry);
+        $files = $this->getFileList($ancestry, $finderModifier);
         $fs    = new Filesystem;
 
         try {
@@ -681,35 +723,50 @@ class Theme
 
     protected function prepareDestinationDirectory(string $path, bool $safeCheckOff = false)
     {
-        if (!$safeCheckOff && !$this->safeCheck($path)) {
+        if (!$safeCheckOff && !$this->directoryPurgeSafeCheck($path)) {
             MiravelFacade::exception(PathPurgeSafeCheckException::class, compact('path'), __FILE__, __LINE__);
         }
 
         try {
-            $this->purge($path);
-            Utilities::mkdir($path);
+            $this->purgeDirectory($path);
         } catch (Exception $exception) {
             MiravelFacade::exception(PathPurgeException::class, compact('path'), __FILE__, __LINE__);
         }
     }
 
-    protected function safeCheck(string $path)
+    protected function directoryPurgeSafeCheck(string $path)
     {
         $safedir = MiravelFacade::getStoragePath();
 
         return Utilities::pathBelongsTo($path, $safedir);
     }
 
-    protected function purge(string $path)
+    protected function purgeDirectory(string $path)
     {
-        return Utilities::purgePath($path);
+        Utilities::purgePath($path);
+        Utilities::mkdir($path);
     }
 
-    protected function getDefaultThemeDumpPath()
+    public function getDefaultThemeDumpPath()
     {
         return implode(DIRECTORY_SEPARATOR, [
             MiravelFacade::getStoragePath(),
             $this->getName()
         ]);
+    }
+
+    /**
+     * Build the theme
+     */
+    public function build()
+    {
+        $builder = $this->makeBuilder();
+
+        $builder->build();
+    }
+
+    protected function makeBuilder(): ThemeBuilderInterface
+    {
+        return new LaravelMixThemeBuilder($this);
     }
 }
