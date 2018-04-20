@@ -140,6 +140,15 @@ abstract class BaseThemeBuilder implements ThemeBuilderInterface
         return $this;
     }
 
+    public function report($message, $method = 'line')
+    {
+        if (!($cli = $this->getCli()) || $this->isQuiet()) {
+            return;
+        }
+
+        $cli->$method($message);
+    }
+
     /**
      * @return null|Command
      */
@@ -188,6 +197,26 @@ abstract class BaseThemeBuilder implements ThemeBuilderInterface
         //
     }
 
+    public function isDebugVerbosity()
+    {
+        if (!$cli = $this->getCli()) {
+            return false;
+        }
+
+        $verbosity = $cli->getOutput()->getVerbosity();
+
+        return OutputInterface::VERBOSITY_DEBUG === $verbosity;
+    }
+
+    public function isQuiet()
+    {
+        if (!$cli = $this->getCli()) {
+            return;
+        }
+
+        return $cli->option('quiet');
+    }
+
     /**
      * Execute the build, dispatching the relevant events along the way
      */
@@ -202,24 +231,4 @@ abstract class BaseThemeBuilder implements ThemeBuilderInterface
 
     // to be implemented in child classes
     abstract protected function execute();
-
-    protected function isDebugVerbosity()
-    {
-        if (!$cli = $this->getCli()) {
-            return false;
-        }
-
-        $verbosity = $cli->getOutput()->getVerbosity();
-
-        return OutputInterface::VERBOSITY_DEBUG === $verbosity;
-    }
-
-    protected function isQuiet()
-    {
-        if (!$cli = $this->getCli()) {
-            return;
-        }
-
-        return $cli->option('quiet');
-    }
 }

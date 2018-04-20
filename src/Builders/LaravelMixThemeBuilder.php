@@ -268,12 +268,4 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
         $this->line($message);
     }
 
-    public function report($message, $method = 'line')
-    {
-        if (!$cli = $this->getCli() || $this->isQuiet()) {
-            return;
-        }
-
-        $cli->$method($message);
-    }
 }
