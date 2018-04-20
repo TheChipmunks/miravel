@@ -9,6 +9,11 @@ use Illuminate\View\View;
 class Utilities
 {
     /**
+     * @var Filesystem
+     */
+    protected static $fs;
+
+    /**
      * @param string $path
      *
      * @return string|void
@@ -216,7 +221,7 @@ class Utilities
     public static function getPathComponents(string $path)
     {
         $lookupPaths = Theme::getThemeDirPaths();
-        $fs          = new Filesystem;
+        $fs          = static::getFilesystem();
 
         foreach ($lookupPaths as $lookupPath) {
             if (!$lookupPath || !$fs->isAbsolutePath($lookupPath)) {
@@ -281,7 +286,7 @@ class Utilities
 
     public static function isAbsolutePath($path)
     {
-        $fs = new Filesystem;
+        $fs = static::getFilesystem();
 
         return $fs->isAbsolutePath($path);
     }
@@ -419,6 +424,8 @@ class Utilities
 
     public static function pathBelongsTo(string $path, string $parent)
     {
+        // IMPORTANT: BOTH PATHS MUST EXIST!
+
         $path   = realpath($path);
         $parent = realpath($parent);
 
@@ -428,13 +435,28 @@ class Utilities
 
     public static function purgePath(string $path)
     {
-        $fs = new Filesystem;
+        $fs = static::getFilesystem();
         $fs->remove($path);
     }
 
-    public static function mkdir(string $path)
+    public static function mkdir(string $path, int $mode = 0644)
     {
-        $fs = new Filesystem;
-        $fs->mkdir($path, 0644);
+        $fs = static::getFilesystem();
+        $fs->mkdir($path, $mode);
+    }
+
+    public static function fileExists(string $path)
+    {
+        $fs = static::getFilesystem();
+        return $fs->exists($path);
+    }
+
+    public static function getFilesystem()
+    {
+        if (!static::$fs) {
+            static::$fs = new Filesystem;
+        }
+
+        return static::$fs;
     }
 }

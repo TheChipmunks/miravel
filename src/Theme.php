@@ -602,7 +602,7 @@ class Theme
         callable $finderModifier = null
     ): array {
         $results = [];
-        $fs      = new Filesystem;
+        $fs      = Utilities::getFilesystem();
         $finder  = $this->getFinder($finderModifier);
 
         $finder->in($fullpath);
@@ -705,7 +705,7 @@ class Theme
         $this->prepareDestinationDirectory($destination);
 
         $files = $this->getFileList($ancestry, $finderModifier);
-        $fs    = new Filesystem;
+        $fs    = Utilities::getFilesystem();
 
         try {
             foreach ($files as $relativePath => $source) {
@@ -723,8 +723,12 @@ class Theme
 
     protected function prepareDestinationDirectory(string $path, bool $safeCheckOff = false)
     {
-        if (!$safeCheckOff && !$this->directoryPurgeSafeCheck($path)) {
-            MiravelFacade::exception(PathPurgeSafeCheckException::class, compact('path'), __FILE__, __LINE__);
+        if (Utilities::fileExists($path) && !$safeCheckOff) {
+            $safe = $this->directoryPurgeSafeCheck($path);
+
+            if (!$safe) {
+                MiravelFacade::exception(PathPurgeSafeCheckException::class, compact('path'), __FILE__, __LINE__);
+            }
         }
 
         try {
@@ -734,6 +738,13 @@ class Theme
         }
     }
 
+    /**
+     * Returns true if it is safe to purge/delete directory, false otherwise
+     *
+     * @param string $path  The path to check
+     *
+     * @return bool
+     */
     protected function directoryPurgeSafeCheck(string $path)
     {
         $safedir = MiravelFacade::getStoragePath();
@@ -743,7 +754,10 @@ class Theme
 
     protected function purgeDirectory(string $path)
     {
-        Utilities::purgePath($path);
+        if (Utilities::fileExists($path)) {
+            Utilities::purgePath($path);
+        }
+
         Utilities::mkdir($path);
     }
 
