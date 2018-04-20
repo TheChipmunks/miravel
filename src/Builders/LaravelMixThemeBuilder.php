@@ -71,7 +71,9 @@ class LaravelMixThemeBuilder extends BaseThemeBuilder implements ThemeBuilderInt
     {
         $extensions = $this->getExtensionListToDump();
 
-        $regex = collect($extensions)->map('preg_quote')->implode('|');
+        $regex = collect($extensions)->map(function ($v) { return preg_quote($v, '/'); })
+                                     ->implode('|');
+
         $regex = sprintf('/\.(%s)$/i', $regex);
 
         return function (Finder $finder) use ($regex) {
