@@ -45,7 +45,7 @@ class BuildCommand extends Command
             MiravelFacade::exception(ThemeNotFoundException::class, ['theme' => $name], __FILE__, __LINE__);
         }
 
-        $theme->build();
+        $theme->build($this);
 
         // if ($this->option('publish')) {
         //     $theme->publish();
