@@ -89,13 +89,13 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
 
         $this->checkNpmPackages();
 
-        $this->checkMixFile();
-
         $this->report('Requirement check complete.');
     }
 
     public function run()
     {
+        $this->checkMixFile();
+
         $command = $this->getBuildCommand();
 
         // $result = $this->runCliCommand($command);

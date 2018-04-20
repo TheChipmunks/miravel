@@ -13,7 +13,7 @@ class BuildCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'miravel:build {theme} {--publish}';
+    protected $signature = 'miravel:build {theme} {--publish} {--skip-dep-checks}';
 
     /**
      * The console command description.
