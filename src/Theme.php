@@ -5,7 +5,6 @@ namespace Miravel;
 use Miravel\Builders\LaravelMixThemeBuilder;
 use Miravel\Builders\ThemeBuilderInterface;
 use Miravel\Exceptions\PathPurgeSafeCheckException;
-use Symfony\Component\Filesystem\Filesystem;
 use Miravel\Exceptions\PathPurgeException;
 use Miravel\Resources\BaseThemeResource;
 use Miravel\Factories\ResourceFactory;
@@ -547,15 +546,16 @@ class Theme
     ) {
         $results = [];
 
-        foreach ($this->getPaths() as $themepath) {
-            if (!$startingPath = $this->makeStartingPath($relativePath)){
+        foreach ($this->getPaths() as $pathkey => $themepath) {
+            $fullpath = $this->buildFilePath($relativePath, $pathkey);
+            if (!Utilities::fileExists($fullpath)) {
                 continue;
             }
 
             $results = array_merge(
                 $results,
                 $this->searchInPath(
-                    $startingPath,
+                    $fullpath,
                     $filter,
                     $themepath,
                     $finderModifier
@@ -566,33 +566,16 @@ class Theme
         if ($ancestry && $this->parentTheme) {
             $results = array_merge(
                 $results,
-                $this->parentTheme->scan($relativePath, $filter)
+                $this->parentTheme->scan(
+                    $relativePath,
+                    $filter,
+                    true,
+                    $finderModifier
+                )
             );
         }
 
         return array_unique($results);
-    }
-
-    public function getFirstNonEmptyPath()
-    {
-        foreach ($this->paths as $path) {
-            if (!empty($path)) {
-                return $path;
-            }
-        }
-    }
-
-    protected function makeStartingPath(string $relativePath)
-    {
-        if (empty($relativePath) && $themepath = $this->getFirstNonEmptyPath()){
-            if ($resource = $this->makeResource($themepath)) {
-                return $resource->getRealPath();
-            }
-        }
-
-        if ($resource = $this->getResource($relativePath)) {
-            return $resource->getRealPath();
-        }
     }
 
     protected function searchInPath(
