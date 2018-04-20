@@ -3,7 +3,7 @@
 namespace Miravel;
 
 use Miravel\Events\FinishElementRenderEvent;
-use Miravel\Events\StartElementRenderEvent;
+use Miravel\Events\ElementRenderStartedEvent;
 use Miravel\Traits\AccessesDataProperties;
 use Miravel\Resources\BaseThemeResource;
 use Miravel\Traits\ExpectsDataFormats;
@@ -192,7 +192,7 @@ class Element
      */
     public function render(): string
     {
-        event(new StartElementRenderEvent($this));
+        event(new ElementRenderStartedEvent($this));
 
         $viewPath = $this->getViewName();
         $viewVars = $this->prepareViewVars();
@@ -204,7 +204,7 @@ class Element
             $output = '';
         }
 
-        event(new FinishElementRenderEvent($this));
+        event(new ElementRenderFinishedEvent($this));
 
         return $output;
     }

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\View;
 // events
 use Miravel\Listeners\ElementRenderEventListener;
 use Miravel\Events\FinishElementRenderEvent;
-use Miravel\Events\StartElementRenderEvent;
+use Miravel\Events\ElementRenderStartedEvent;
 
 //commands
 use Miravel\Console\Commands\PublishCommand;
@@ -147,12 +147,12 @@ class ThemeServiceProvider extends ServiceProvider
         // finishRender events
 
         Event::listen(
-            StartElementRenderEvent::class,
+            ElementRenderStartedEvent::class,
             ElementRenderEventListener::class
         );
 
         Event::listen(
-            FinishElementRenderEvent::class,
+            ElementRenderFinishedEvent::class,
             ElementRenderEventListener::class
         );
     }

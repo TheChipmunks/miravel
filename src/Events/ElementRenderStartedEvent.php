@@ -4,7 +4,7 @@ namespace Miravel\Events;
 
 use Miravel\Element;
 
-class FinishElementRenderEvent
+class ElementRenderStartedEvent
 {
     /**
      * @var Element

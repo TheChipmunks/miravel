@@ -2,15 +2,15 @@
 
 namespace Miravel\Listeners;
 
-use Miravel\Events\FinishElementRenderEvent;
-use Miravel\Events\StartElementRenderEvent;
+use Miravel\Events\ElementRenderFinishedEvent;
+use Miravel\Events\ElementRenderStartedEvent;
 use Miravel\Facade as MiravelFacade;
 
 class ElementRenderEventListener
 {
     public function handle($event)
     {
-        if ($event instanceof StartElementRenderEvent) {
+        if ($event instanceof ElementRenderStartedEvent) {
             $this->handleStartElementRender($event);
         }
 
@@ -19,14 +19,14 @@ class ElementRenderEventListener
         }
     }
 
-    protected function handleStartElementRender(StartElementRenderEvent $event)
+    protected function handleStartElementRender(ElementRenderStartedEvent $event)
     {
         $signedName = $event->element->getSignedName();
 
         MiravelFacade::registerTopLevelRenderingElement($signedName);
     }
 
-    protected function handleFinishElementRender(FinishElementRenderEvent $event)
+    protected function handleFinishElementRender(ElementRenderFinishedEvent $event)
     {
         $signedName = $event->element->getSignedName();
 
