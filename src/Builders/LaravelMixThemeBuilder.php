@@ -83,6 +83,12 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
 
     public function checkRequirements()
     {
+        if ($cli = $this->getCli()) {
+            if ($cli->option('skip-dep-checks')) {
+                return;
+            }
+        }
+
         $this->report('Checking dependencies and requirements...');
 
         $this->checkNpm();
