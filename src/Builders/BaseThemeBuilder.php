@@ -3,6 +3,9 @@
 namespace Miravel\Builders;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Miravel\Events\ThemeBuildDumpCompletedEvent;
+use Miravel\Events\ThemeBuildFinishedEvent;
+use Miravel\Events\ThemeBuildStartedEvent;
 use Illuminate\Console\Command;
 use Miravel\Theme;
 
