@@ -55,7 +55,9 @@ abstract class BaseThemeBuilder implements ThemeBuilderInterface
 
     public function initEnv(): ThemeBuilderInterface
     {
-        $this->setEnv(app()->environment());
+        $env = app()->environment('production') ? 'production' : 'development';
+
+        $this->setEnv($env);
 
         return $this;
     }
