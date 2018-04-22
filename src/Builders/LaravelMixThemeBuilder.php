@@ -24,8 +24,8 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
     protected $npmCommands = [
         'build'                => 'cd %s; npm run %s -- --env.mixfile=%s',
         'check-npm'            => 'npm -v',
-        'check-package'        => 'npm list %s --depth=0 | grep %1$s',
-        'check-package-global' => 'npm list -g %s --depth=0 | grep %1$s',
+        'check-package'        => 'npm list %s | grep %1$s',
+        'check-package-global' => 'npm list -g %s | grep %1$s',
     ];
 
     protected $requiredNpmPackages = ['laravel-mix'];
