@@ -1,4 +1,4 @@
 let mix = require('laravel-mix');
 
-mix .sass('assets/src/style.scss', 'assets/dist')
-    .scripts('assets/src/script.js', 'assets/dist/script.js');
+mix .sass('assets/src/style.scss', 'public/css/test.mix.css')
+    .js(['assets/src/script.js'], 'public/js/test.mix.js');

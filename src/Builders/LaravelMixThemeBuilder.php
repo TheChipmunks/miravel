@@ -22,13 +22,19 @@ use Exception;
 class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBuilderInterface
 {
     protected $npmCommands = [
-        'build'                => 'cd %s; npm run %s -- --env.mixfile=%s',
+        'build'                => 'node %s NODE_ENV=%s %s --progress --hide-modules --config=%s  --env.themepath=%s --env.mixfile=%s',
         'check-npm'            => 'npm -v',
         'check-package'        => 'npm list %s | grep %1$s',
         'check-package-global' => 'npm list -g %s | grep %1$s',
     ];
 
-    protected $requiredNpmPackages = ['laravel-mix'];
+    protected $requiredNpmPackages = ['laravel-mix', 'webpack', 'cross-env'];
+    
+    protected $crossEnvJs = 'node_modules/cross-env/dist/bin/cross-env.js';
+
+    protected $webpackJs = 'node_modules/webpack/bin/webpack.js';
+
+    protected $defaultWebpackConfig = 'vendor/miravel/miravel/mix/webpack.config.js';
 
     protected $defaultMixFileName = 'webpack.mix.js';
 
@@ -54,7 +60,7 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
         $extensions = $this->getExtensionListToDump();
         $preg_quote = function ($v) { return preg_quote($v, '/'); };
 
-        $regex = collect($extensions)->map($preg_quote) ->implode('|');
+        $regex = collect($extensions)->map($preg_quote)->implode('|');
         $regex = sprintf('/\.(%s)$/i', $regex);
 
         return function (Finder $finder) use ($regex) {
@@ -73,12 +79,11 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
     public function getBuildCommand(): string
     {
         $command = $this->npmCommands['build'];
-
-        $dir     = $this->getBuildDirectory();
-        $env     = $this->getEnv();
-        $mixfile = $this->getMixFileName();
-
-        return sprintf($command, $dir, $env, $mixfile);
+        $baseDir = base_path() . DIRECTORY_SEPARATOR;
+        $dir     = $this->getBuildDirectory() . DIRECTORY_SEPARATOR;
+        $themePath     = str_replace($baseDir, '', $dir);
+        
+        return sprintf($command, $this->crossEnvJs, $this->getEnv(), $this->webpackJs, $this->defaultWebpackConfig, $themePath, $themePath . $this->defaultMixFileName);
     }
 
     public function checkRequirements()
@@ -104,15 +109,15 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
 
         $command = $this->getBuildCommand();
 
-        // $result = $this->runCliCommand($command);
+        $result = $this->runCliCommand($command);
 
-        $this->report(sprintf('Running %s', $command));
+//         $this->report(sprintf('Running %s', $command));
 
-        // if (!$result->isSuccessful()) {
-        //     $this->reportBuildErrors($result);
-        // } else {
-        //     $this->reportBuildSuccess($result);
-        // }
+        if (!$result->isSuccessful()) {
+            $this->reportBuildErrors($result);
+        } else {
+            $this->reportBuildSuccess($result);
+        }
     }
 
     public function getMixFileName(): string
