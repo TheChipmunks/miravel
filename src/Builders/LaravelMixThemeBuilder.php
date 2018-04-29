@@ -37,11 +37,11 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
 
     protected $requiredNpmPackages      = ['laravel-mix', 'webpack', 'cross-env'];
 
-    protected $crossEnvJs               = 'node_modules/cross-env/dist/bin/cross-env.js';
-
-    protected $webpackJs                = 'node_modules/webpack/bin/webpack.js';
-
-    protected $defaultWebpackConfig     = 'vendor/miravel/miravel/mix/webpack.config.js';
+    protected $crossEnvJs               = 'node_modules' . DIRECTORY_SEPARATOR . 'cross-env' . DIRECTORY_SEPARATOR . 'dist' . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'cross-env.js';
+    
+    protected $webpackJs                = 'node_modules' . DIRECTORY_SEPARATOR . 'webpack' . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'webpack.js';
+    
+    protected $defaultWebpackConfig     = 'vendor' . DIRECTORY_SEPARATOR . 'miravel' . DIRECTORY_SEPARATOR . 'miravel' . DIRECTORY_SEPARATOR . 'mix' . DIRECTORY_SEPARATOR . 'webpack.config.js';
 
     protected $defaultMixFileName       = 'webpack.mix.js';
 
@@ -154,14 +154,13 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
     {
         $buildDir = $this->getBuildDirectory();
         $mixfile  = $this->getMixFileName();
-        $mixfile  = Utilities::composePath([$buildDir, $mixfile]);
 
         if ($relative) {
             $fs       = Utilities::getFilesystem();
-            $mixfile = $fs->makePathRelative($mixfile, base_path());
+            $buildDir = $fs->makePathRelative($buildDir, base_path());
         }
 
-        return $mixfile;
+        return Utilities::composePath([$buildDir, $mixfile]);;
     }
 
 

@@ -57,7 +57,7 @@ trait InteractsWithNpm
         return $found;
     }
 
-    public function checkNpmPackage($package): bool
+    public function checkNpmPackage($package)
     {
         foreach (['check-package', 'check-package-global'] as $env) {
             $version = $this->checkNpmPackageInEnv($package, $env);
