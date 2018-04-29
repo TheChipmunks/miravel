@@ -5,8 +5,8 @@ namespace Miravel\Builders;
 use Miravel\Exceptions\RequiredFileMissingException;
 use Symfony\Component\Finder\Finder;
 use Miravel\Facade as MiravelFacade;
+use Miravel\Traits\RunsCliCommands;
 use Miravel\CliCommandResult;
-use Exception;
 
 /**
  * Class LaravelMixThemeBuilder
@@ -19,24 +19,35 @@ use Exception;
  *
  * @package Miravel\Builders
  */
-class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBuilderInterface
+class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
+    ThemeBuilderInterface
 {
-    protected $npmCommands = [
-        'build'                => 'node %s NODE_ENV=%s %s --progress --hide-modules --config=%s --env.themepath=%s --env.mixfile=%s',
-        'check-npm'            => 'npm -v',
-        'check-package'        => 'npm list %s | grep %1$s',
-        'check-package-global' => 'npm list -g %s | grep %1$s',
-    ];
+    use RunsCliCommands;
 
-    protected $requiredNpmPackages  = ['laravel-mix', 'webpack', 'cross-env'];
+    protected $buildCommand             = 'node %s NODE_ENV=%s %s' .
+                                          ' --progress' .
+                                          ' --hide-modules' .
+                                          ' --config=%s' .
+                                          ' --env.themepath=%s' .
+                                          ' --env.mixfile=%s';
 
-    protected $crossEnvJs           = 'node_modules/cross-env/dist/bin/cross-env.js';
+    protected $requiredNpmPackages      = ['laravel-mix', 'webpack', 'cross-env'];
 
-    protected $webpackJs            = 'node_modules/webpack/bin/webpack.js';
+    protected $crossEnvJs               = 'node_modules/cross-env/dist/bin/cross-env.js';
 
-    protected $defaultWebpackConfig = 'vendor/miravel/miravel/mix/webpack.config.js';
+    protected $webpackJs                = 'node_modules/webpack/bin/webpack.js';
 
-    protected $defaultMixFileName   = 'webpack.mix.js';
+    protected $defaultWebpackConfig     = 'vendor/miravel/miravel/mix/webpack.config.js';
+
+    protected $defaultMixFileName       = 'webpack.mix.js';
+
+    protected $packageRequiredMessage   = 'npm package "%s" is required to run Laravel Mix ' .
+                                          'Theme Builder. Try running "npm install -g %1$s"';
+
+    protected $npmRequiredMessage       = 'npm is required to run Laravel Mix Theme Builder. ' .
+                                          'To learn how to install node.js and npm, ' .
+                                          'please visit https://docs.npmjs.com/getting-started/' .
+                                          'installing-node#install-npm--manage-npm-versions';
 
     /**
      * @var string
@@ -150,75 +161,6 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
         }
     }
 
-    public function checkNpm()
-    {
-        $command = $this->npmCommands['check-npm'];
-
-        $result = $this->runCliCommand($command);
-
-        if (!$result->isSuccessful()) {
-            $message = 'npm is required to run LaravelMix Theme Builder. ' .
-                       'For information on how to install node.js and npm, ' .
-                       'please visit https://docs.npmjs.com/getting-started/' .
-                       'installing-node#install-npm--manage-npm-versions';
-
-            throw new Exception($message);
-        }
-
-        $npmversion = $result->getLastOutputLine();
-        $this->report(sprintf('npm found, version %s', $npmversion));
-    }
-
-    public function getRequiredNpmPackages(): array
-    {
-        return (array)$this->requiredNpmPackages;
-    }
-
-    public function checkNpmPackages()
-    {
-        $packages = $this->getRequiredNpmPackages();
-
-        foreach ($packages as $package) {
-            if (!$this->checkNpmPackage($package)) {
-                $message = 'npm package "%s" is required to run LaravelMix ' .
-                           'Theme Builder. Try running "npm install -g %1$s"';
-
-                $message = sprintf($message, $package);
-
-                throw new Exception($message);
-            }
-        }
-    }
-
-    public function checkNpmPackage($package): bool
-    {
-        foreach (['check-package', 'check-package-global'] as $env) {
-            if (true === $this->checkNpmPackageInEnv($package, $env)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function checkNpmPackageInEnv(string $package, string $env)
-    {
-        $check = $this->npmCommands[$env];
-        $check = sprintf($check, $package);
-
-        $result = $this->runCliCommand($check);
-
-        if ($result->isSuccessful() && count($result->getOutput()) >= 1) {
-            $lastLine = $result->getLastOutputLine();
-            $version = substr($lastLine, strpos($lastLine, '@') + 1);
-            $this->report(sprintf('%s found, version %s', $package, $version));
-
-            return true;
-        }
-
-        return $result;
-    }
-
     protected function reportBuildErrors(CliCommandResult $result)
     {
         $message = 'Errors were encountered while trying to build theme %s. ' .
@@ -235,7 +177,7 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
             if ($this->isDebugVerbosity()) {
                 $this->showCommandOutput($result);
             } else {
-                $this->showVerbosityInfo();
+                $this->showVerbosityHint();
             }
         }
 
@@ -265,7 +207,7 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
         }
     }
 
-    public function showVerbosityInfo()
+    public function showVerbosityHint()
     {
         $message = 'To see the npm command output, run artisan miravel:build ' .
                    'with the -vvv flag.';

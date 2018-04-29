@@ -2,10 +2,13 @@
 
 namespace Miravel\Builders;
 
-use Miravel\CliCommandResult;
+use Miravel\Traits\RunsCliCommands;
 
-abstract class CommandLineThemeBuilder extends BaseThemeBuilder implements ThemeBuilderInterface
+abstract class CommandLineThemeBuilder extends BaseThemeBuilder implements
+    ThemeBuilderInterface
 {
+    use RunsCliCommands;
+
     protected $command = '';
 
     public function execute()
@@ -31,21 +34,6 @@ abstract class CommandLineThemeBuilder extends BaseThemeBuilder implements Theme
     public function getCliCommand()
     {
         return $this->command;
-    }
-
-    /**
-     * @param string $command
-     *
-     * @return CliCommandResult
-     */
-    public function runCliCommand(string $command)
-    {
-        $return = 0;
-        $output = [];
-
-        exec($command, $output, $return);
-
-        return new CliCommandResult($output, $return);
     }
 
     // to be implemented in child classes
