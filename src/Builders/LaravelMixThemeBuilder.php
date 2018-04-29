@@ -22,21 +22,21 @@ use Exception;
 class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBuilderInterface
 {
     protected $npmCommands = [
-        'build'                => 'node %s NODE_ENV=%s %s --progress --hide-modules --config=%s  --env.themepath=%s --env.mixfile=%s',
+        'build'                => 'node %s NODE_ENV=%s %s --progress --hide-modules --config=%s --env.themepath=%s --env.mixfile=%s',
         'check-npm'            => 'npm -v',
         'check-package'        => 'npm list %s | grep %1$s',
         'check-package-global' => 'npm list -g %s | grep %1$s',
     ];
 
-    protected $requiredNpmPackages = ['laravel-mix', 'webpack', 'cross-env'];
-    
-    protected $crossEnvJs = 'node_modules/cross-env/dist/bin/cross-env.js';
+    protected $requiredNpmPackages  = ['laravel-mix', 'webpack', 'cross-env'];
 
-    protected $webpackJs = 'node_modules/webpack/bin/webpack.js';
+    protected $crossEnvJs           = 'node_modules/cross-env/dist/bin/cross-env.js';
+
+    protected $webpackJs            = 'node_modules/webpack/bin/webpack.js';
 
     protected $defaultWebpackConfig = 'vendor/miravel/miravel/mix/webpack.config.js';
 
-    protected $defaultMixFileName = 'webpack.mix.js';
+    protected $defaultMixFileName   = 'webpack.mix.js';
 
     /**
      * @var string
@@ -82,7 +82,7 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements ThemeBui
         $baseDir = base_path() . DIRECTORY_SEPARATOR;
         $dir     = $this->getBuildDirectory() . DIRECTORY_SEPARATOR;
         $themePath     = str_replace($baseDir, '', $dir);
-        
+
         return sprintf($command, $this->crossEnvJs, $this->getEnv(), $this->webpackJs, $this->defaultWebpackConfig, $themePath, $themePath . $this->defaultMixFileName);
     }
 
