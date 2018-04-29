@@ -90,7 +90,8 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
 
         $dir         = $this->getBuildDirectory();
         $themePath   = $fs->makePathRelative($dir, base_path());
-        $mixFilePath = $this->getMixFilePath();
+        $mixFilePath = $this->getMixFilePath(true);
+
 
         return sprintf($command,
             $this->crossEnvJs,
@@ -149,13 +150,20 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
         return $this->mixFileName;
     }
 
-    public function getMixFilePath()
+    public function getMixFilePath(bool $relative = false)
     {
         $buildDir = $this->getBuildDirectory();
         $mixfile  = $this->getMixFileName();
+        $mixfile  = Utilities::composePath([$buildDir, $mixfile]);
 
-        return Utilities::composePath([$buildDir, $mixfile]);
+        if ($relative) {
+            $fs       = Utilities::getFilesystem();
+            $mixfile = $fs->makePathRelative($mixfile, base_path());
+        }
+
+        return $mixfile;
     }
+
 
     public function checkMixFile()
     {
