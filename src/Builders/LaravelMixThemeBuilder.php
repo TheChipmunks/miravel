@@ -90,10 +90,10 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
 
     public function getBuildCommand(): string
     {
-        $command = $this->npmCommands['build'];
-        $baseDir = base_path() . DIRECTORY_SEPARATOR;
-        $dir     = $this->getBuildDirectory() . DIRECTORY_SEPARATOR;
-        $themePath     = str_replace($baseDir, '', $dir);
+        $command   = $this->buildCommand;
+        $baseDir   = base_path() . DIRECTORY_SEPARATOR;
+        $dir       = $this->getBuildDirectory() . DIRECTORY_SEPARATOR;
+        $themePath = str_replace($baseDir, '', $dir);
 
         return sprintf($command, $this->crossEnvJs, $this->getEnv(), $this->webpackJs, $this->defaultWebpackConfig, $themePath, $themePath . $this->defaultMixFileName);
     }
