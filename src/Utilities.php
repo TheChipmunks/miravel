@@ -459,4 +459,45 @@ class Utilities
         $fs = static::getFilesystem();
         return $fs->exists($path);
     }
+
+    public static function composePath(array $components)
+    {
+        // strip slashes first
+        $clean = [];
+        $components = array_values($components);
+
+        foreach ($components as $i => $component) {
+            // the first segment
+            if (0 == $i) {
+                $component = rtrim($component, '\/');
+            }
+            // the last segment
+            if ((count($components) - 1) == $i) {
+                $component = ltrim($component, '\/');
+            }
+            // middle segment
+            if ((0 != $i) && (count($components) - 1) != $i) {
+                $component = trim($component, '\/');
+            }
+
+            $clean[] = $component;
+        }
+
+        return implode(DIRECTORY_SEPARATOR, $clean);
+    }
+
+    /**
+     * @param string $command
+     *
+     * @return CliCommandResult
+     */
+    public static function runCliCommand(string $command)
+    {
+        $return = 0;
+        $output = [];
+
+        exec($command, $output, $return);
+
+        return new CliCommandResult($output, $return);
+    }
 }

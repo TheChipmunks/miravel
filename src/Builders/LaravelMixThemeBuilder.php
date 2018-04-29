@@ -6,8 +6,8 @@ use Miravel\Exceptions\RequiredFileMissingException;
 use Miravel\Traits\InteractsWithNpm;
 use Symfony\Component\Finder\Finder;
 use Miravel\Facade as MiravelFacade;
-use Miravel\Traits\RunsCliCommands;
 use Miravel\CliCommandResult;
+use Miravel\Utilities;
 
 /**
  * Class LaravelMixThemeBuilder
@@ -23,7 +23,10 @@ use Miravel\CliCommandResult;
 class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
     ThemeBuilderInterface
 {
-    use RunsCliCommands, InteractsWithNpm;
+    use InteractsWithNpm {
+        checkNpm as traitCheckNpm;
+        checkNpmPackages as traitCheckPackages;
+    }
 
     protected $buildCommand             = 'node %s NODE_ENV=%s %s' .
                                           ' --progress' .
@@ -41,14 +44,6 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
     protected $defaultWebpackConfig     = 'vendor/miravel/miravel/mix/webpack.config.js';
 
     protected $defaultMixFileName       = 'webpack.mix.js';
-
-    protected $packageRequiredMessage   = 'npm package "%s" is required to run Laravel Mix ' .
-                                          'Theme Builder. Try running "npm install -g %1$s"';
-
-    protected $npmRequiredMessage       = 'npm is required to run Laravel Mix Theme Builder. ' .
-                                          'To learn how to install node.js and npm, ' .
-                                          'please visit https://docs.npmjs.com/getting-started/' .
-                                          'installing-node#install-npm--manage-npm-versions';
 
     /**
      * @var string
@@ -90,12 +85,21 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
 
     public function getBuildCommand(): string
     {
-        $command   = $this->buildCommand;
-        $baseDir   = base_path() . DIRECTORY_SEPARATOR;
-        $dir       = $this->getBuildDirectory() . DIRECTORY_SEPARATOR;
-        $themePath = str_replace($baseDir, '', $dir);
+        $fs          = Utilities::getFilesystem();
+        $command     = $this->buildCommand;
 
-        return sprintf($command, $this->crossEnvJs, $this->getEnv(), $this->webpackJs, $this->defaultWebpackConfig, $themePath, $themePath . $this->defaultMixFileName);
+        $dir         = $this->getBuildDirectory();
+        $themePath   = $fs->makePathRelative($dir, base_path());
+        $mixFilePath = $this->getMixFilePath();
+
+        return sprintf($command,
+            $this->crossEnvJs,
+            $this->getEnv(),
+            $this->webpackJs,
+            $this->defaultWebpackConfig,
+            $themePath,
+            $mixFilePath
+        );
     }
 
     public function checkRequirements()
@@ -121,9 +125,9 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
 
         $command = $this->getBuildCommand();
 
-        $result = $this->runCliCommand($command);
+        $result = Utilities::runCliCommand($command);
 
-//         $this->report(sprintf('Running %s', $command));
+        $this->report(sprintf('Running %s', $command));
 
         if (!$result->isSuccessful()) {
             $this->reportBuildErrors($result);
@@ -150,7 +154,7 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
         $buildDir = $this->getBuildDirectory();
         $mixfile  = $this->getMixFileName();
 
-        return implode(DIRECTORY_SEPARATOR, [$buildDir, $mixfile]);
+        return Utilities::composePath([$buildDir, $mixfile]);
     }
 
     public function checkMixFile()
@@ -175,11 +179,6 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
 
         if ($cli = $this->getCli()) {
             $cli->error($message);
-            if ($this->isDebugVerbosity()) {
-                $this->showCommandOutput($result);
-            } else {
-                $this->showVerbosityHint();
-            }
         }
 
         MiravelFacade::error($message);
@@ -210,10 +209,49 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
 
     public function showVerbosityHint()
     {
+        if (!$cli = $this->getCli()) {
+            return;
+        }
+
         $message = 'To see the npm command output, run artisan miravel:build ' .
                    'with the -vvv flag.';
 
-        $this->line($message);
+        $this->cli->line($message);
+    }
+
+    public function getNpmRequiredMessage()
+    {
+        return 'npm is required to run the Laravel Mix Theme Builder. ' .
+               'To learn how to install node.js and npm, ' .
+               'please visit https://docs.npmjs.com/getting-started/' .
+               'installing-node#install-npm--manage-npm-versions';
+    }
+
+    public function getPackageRequiredMessage()
+    {
+        return 'npm package "%s" is required to run the Laravel Mix ' .
+               'Theme Builder. Try running "npm install %1$s"';
+    }
+
+    public function checkNpm()
+    {
+        $version = $this->traitCheckNpm();
+
+        $this->report(sprintf('npm found, version %s', $version));
+    }
+
+    public function checkNpmPackages()
+    {
+        $versions = $this->traitCheckPackages();
+
+        foreach ($versions as $package => $version) {
+            $this->report(sprintf('%s found, version %s', $package, $version));
+        }
+    }
+
+    public function getRequiredNpmPackages()
+    {
+        return (array)$this->requiredNpmPackages;
     }
 
 }

@@ -2,63 +2,67 @@
 
 namespace Miravel\Traits;
 
+use Miravel\CliCommandResult;
+use Miravel\Utilities;
+use Exception;
+
+/**
+ * Trait InteractsWithNpm
+ *
+ * @package Miravel\Traits
+ */
 trait InteractsWithNpm
 {
-    use RunsCliCommands;
-
     protected $npmCommands = [
         'check-npm'                 => 'npm -v',
-        'check-package'             => 'npm list %s | grep %1$s',
-        'check-package-global'      => 'npm list -g %s | grep %1$s',
+        'check-package'             => 'npm list %s',
+        'check-package-global'      => 'npm list -g %s',
     ];
-
-    protected $requiredNpmPackages  = [];
-
-    protected $packageRequiredMessage = 'npm package "%s" is required.' .
-                                        'Try running "npm install -g %1$s"';
-
-    protected $npmRequiredMessage = 'npm is required. ' .
-                                    'To learn how to install node.js and npm, ' .
-                                    'please visit https://docs.npmjs.com/getting-started/' .
-                                    'installing-node#install-npm--manage-npm-versions';
 
     public function checkNpm()
     {
         $command = $this->npmCommands['check-npm'];
 
-        $result = $this->runCliCommand($command);
+        $result = Utilities::runCliCommand($command);
 
         if (!$result->isSuccessful()) {
-            throw new Exception($this->npmRequiredMessage);
+            throw new Exception($this->getNpmRequiredMessage());
         }
 
         $npmversion = $result->getLastOutputLine();
-        $this->report(sprintf('npm found, version %s', $npmversion));
+
+        return $npmversion;
     }
 
     public function getRequiredNpmPackages(): array
     {
-        return (array)$this->requiredNpmPackages;
+        return [];
     }
 
     public function checkNpmPackages()
     {
         $packages = $this->getRequiredNpmPackages();
+        $found    = [];
 
         foreach ($packages as $package) {
-            if (!$this->checkNpmPackage($package)) {
-                $message = sprintf($this->packageRequiredMessage, $package);
+            if (!$version = $this->checkNpmPackage($package)) {
+                $message = $this->getPackageRequiredMessage();
+                $message = sprintf($message, $package);
 
                 throw new Exception($message);
             }
+            $found[$package] = $version;
         }
+
+        return $found;
     }
 
     public function checkNpmPackage($package): bool
     {
         foreach (['check-package', 'check-package-global'] as $env) {
-            if (true === $this->checkNpmPackageInEnv($package, $env)) {
-                return true;
+            $version = $this->checkNpmPackageInEnv($package, $env);
+            if (!$version instanceof CliCommandResult) {
+                return $version;
             }
         }
 
@@ -70,17 +74,47 @@ trait InteractsWithNpm
         $check = $this->npmCommands[$env];
         $check = sprintf($check, $package);
 
-        $result = $this->runCliCommand($check);
+        $result = Utilities::runCliCommand($check);
 
-        if ($result->isSuccessful() && count($result->getOutput()) >= 1) {
-            $lastLine = $result->getLastOutputLine();
-            $version = substr($lastLine, strpos($lastLine, '@') + 1);
-            $this->report(sprintf('%s found, version %s', $package, $version));
-
-            return true;
+        if (!$result->isSuccessful()) {
+            return $result;
         }
 
-        return $result;
+        $output = $result->getOutput();
+        if (!count($output)) {
+            return $result;
+        }
+
+        if (!$version = $this->extractPackageVersion($package, $output)) {
+            return $result;
+        }
+
+        return $version;
     }
 
+    public function getNpmRequiredMessage()
+    {
+        return 'npm is required. ' .
+               'To learn how to install node.js and npm, ' .
+               'please visit https://docs.npmjs.com/getting-started/' .
+               'installing-node#install-npm--manage-npm-versions';
+    }
+
+    public function getPackageRequiredMessage()
+    {
+        return 'npm package "%s" is required.' .
+               'Try running "npm install %1$s"';
+    }
+
+    protected function extractPackageVersion(string $package, array $outputLines)
+    {
+        foreach ($outputLines as $line) {
+            $pos = strpos($line, '@');
+            if (false === strpos($line, $package) || false === $pos) {
+                continue;
+            }
+
+            return substr($line, $pos + 1);
+        }
+    }
 }

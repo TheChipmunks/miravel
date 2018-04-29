@@ -7,8 +7,6 @@ use Miravel\Traits\RunsCliCommands;
 abstract class CommandLineThemeBuilder extends BaseThemeBuilder implements
     ThemeBuilderInterface
 {
-    use RunsCliCommands;
-
     protected $command = '';
 
     public function execute()
