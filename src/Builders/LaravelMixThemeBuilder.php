@@ -3,6 +3,7 @@
 namespace Miravel\Builders;
 
 use Miravel\Exceptions\RequiredFileMissingException;
+use Miravel\Traits\InteractsWithNpm;
 use Symfony\Component\Finder\Finder;
 use Miravel\Facade as MiravelFacade;
 use Miravel\Traits\RunsCliCommands;
@@ -22,7 +23,7 @@ use Miravel\CliCommandResult;
 class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
     ThemeBuilderInterface
 {
-    use RunsCliCommands;
+    use RunsCliCommands, InteractsWithNpm;
 
     protected $buildCommand             = 'node %s NODE_ENV=%s %s' .
                                           ' --progress' .
