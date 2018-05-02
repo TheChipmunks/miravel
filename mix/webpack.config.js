@@ -1,9 +1,11 @@
 let mix = require('laravel-mix');
+let fs = require('fs');
 let argv = require('yargs').argv;
 
-global.File = require('./File');
 global.ThemePath =  argv.env.themepath;
 global.RootPath =  Mix.paths.root();
+global.LaravelMixPath =  path.resolve(RootPath, 'node_modules/laravel-mix/');
+global.File = require('./File');
 
 console.log("Theme: " + ThemePath);
 console.log("Public: " + ThemePath + 'public');
@@ -13,10 +15,18 @@ mix.options({
     clearConsole: false
 });
 
+fs.exists(LaravelMixPath + '/src/components/ComponentFactory.js', function(exists) {
+	console.log(exists);
+    if (exists) {
+    		let ComponentFactory = require(LaravelMixPath + '/src/components/ComponentFactory');
+    		new ComponentFactory().installAll();
+    }
+});
+
 require(Mix.paths.mix());
 
 Mix.dispatch('init', Mix);
 
-let WebpackConfig = require('../../../../node_modules/laravel-mix/src/builder/WebpackConfig');
+let WebpackConfig = require(LaravelMixPath + '/src/builder/WebpackConfig');
 
 module.exports = new WebpackConfig().build();
