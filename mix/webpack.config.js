@@ -15,14 +15,13 @@ mix.options({
     clearConsole: false
 });
 
-console.log('LaravelMixPath: ' + LaravelMixPath);
-console.log('global.LaravelMixPath: ' + global.LaravelMixPath);
-
-fs.exists(global.LaravelMixPath + '/src/components/ComponentFactory.js', function(exists) {
+fs.exists(LaravelMixPath + '/src/components/ComponentFactory.js', function(exists) {
 	console.log(exists);
     if (exists) {
     		let ComponentFactory = require(LaravelMixPath + '/src/components/ComponentFactory');
     		new ComponentFactory().installAll();
+    } else {
+        console.log(LaravelMixPath + '/src/components/ComponentFactory.js' + ' not exists');
     }
 });
 
