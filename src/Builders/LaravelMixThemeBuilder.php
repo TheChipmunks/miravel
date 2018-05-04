@@ -25,7 +25,6 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
 {
     use InteractsWithNpm {
         checkNpm as traitCheckNpm;
-        checkNpmPackages as traitCheckPackages;
     }
 
     protected $buildCommand             = 'node %s NODE_ENV=%s %s' .
@@ -242,16 +241,25 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
 
     public function checkNpm()
     {
+        $this->report("npm ...\n");
         $version = $this->traitCheckNpm();
-
-        $this->report(sprintf('npm found, version %s', $version));
+        $this->report("\033[1A\033[1A\033[1A");
+        $this->report(sprintf("npm found, version %s", $version));
     }
 
     public function checkNpmPackages()
     {
-        $versions = $this->traitCheckPackages();
-
-        foreach ($versions as $package => $version) {
+        $packages = $this->getRequiredNpmPackages();
+        
+        foreach ($packages as $package) {
+            $this->report("{$package} ...\n");
+            if (!$version = $this->checkNpmPackage($package)) {
+                $message = $this->getPackageRequiredMessage();
+                $message = sprintf($message, $package);
+                
+                throw new \Exception($message);
+            }
+            $this->report("\033[1A\033[1A\033[1A");
             $this->report(sprintf('%s found, version %s', $package, $version));
         }
     }
