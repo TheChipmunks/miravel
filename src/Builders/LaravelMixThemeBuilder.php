@@ -8,6 +8,7 @@ use Symfony\Component\Finder\Finder;
 use Miravel\Facade as MiravelFacade;
 use Miravel\CliCommandResult;
 use Miravel\Utilities;
+use Miravel\Theme;
 
 /**
  * Class LaravelMixThemeBuilder
@@ -36,11 +37,11 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
 
     protected $requiredNpmPackages      = ['laravel-mix', 'webpack', 'cross-env'];
 
-    protected $crossEnvJs               = 'node_modules' . DIRECTORY_SEPARATOR . 'cross-env' . DIRECTORY_SEPARATOR . 'dist' . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'cross-env.js';
-    
-    protected $webpackJs                = 'node_modules' . DIRECTORY_SEPARATOR . 'webpack' . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'webpack.js';
-    
-    protected $defaultWebpackConfig     = 'vendor' . DIRECTORY_SEPARATOR . 'miravel' . DIRECTORY_SEPARATOR . 'miravel' . DIRECTORY_SEPARATOR . 'mix' . DIRECTORY_SEPARATOR . 'webpack.config.js';
+    protected $paths = [
+        'crossEnvJs'                    => 'node_modules/cross-env/dist/bin/cross-env.js',
+        'webpackJs'                     => 'node_modules/webpack/bin/webpack.js',
+        'defaultWebpackConfig'          => 'vendor/miravel/miravel/mix/webpack.config.js',
+    ];
 
     protected $defaultMixFileName       = 'webpack.mix.js';
 
@@ -53,6 +54,20 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
      * @var array
      */
     public $extensionList = ['scss', 'sass', 'less', 'styl', 'css', 'es5', 'es6', 'js', 'json'];
+
+    public function __construct(Theme $theme)
+    {
+        parent::__construct($theme);
+
+        $this->preparePaths();
+    }
+
+    protected function preparePaths()
+    {
+        foreach ($this->paths as $name => $path) {
+            $this->paths[$name] = str_replace('/', DIRECTORY_SEPARATOR, $path);
+        }
+    }
 
     /**
      * This builder only needs specific file types
@@ -93,10 +108,10 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
 
 
         return sprintf($command,
-            $this->crossEnvJs,
+            $this->paths['crossEnvJs'],
             $this->getEnv(),
-            $this->webpackJs,
-            $this->defaultWebpackConfig,
+            $this->paths['webpackJs'],
+            $this->paths['defaultWebpackConfig'],
             $themePath,
             $mixFilePath
         );
@@ -250,13 +265,13 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
     public function checkNpmPackages()
     {
         $packages = $this->getRequiredNpmPackages();
-        
+
         foreach ($packages as $package) {
             $this->report("{$package} ...\n");
             if (!$version = $this->checkNpmPackage($package)) {
                 $message = $this->getPackageRequiredMessage();
                 $message = sprintf($message, $package);
-                
+
                 throw new \Exception($message);
             }
             $this->report("\033[1A\033[1A\033[1A");
