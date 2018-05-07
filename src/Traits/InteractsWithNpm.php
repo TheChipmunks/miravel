@@ -2,7 +2,6 @@
 
 namespace Miravel\Traits;
 
-use Miravel\CliCommandResult;
 use Miravel\Utilities;
 use Exception;
 
@@ -14,107 +13,38 @@ use Exception;
 trait InteractsWithNpm
 {
     protected $npmCommands = [
-        'check-npm'                 => 'npm -v',
-        'check-package'             => 'npm list %s',
-        'check-package-global'      => 'npm list -g %s',
+        'check-node'                 => 'node -v',
+        'check-laravel-mix'          => 'node -p "var modulePath = require.resolve(\'laravel-mix\'); modulePath = modulePath.substring(0, modulePath.indexOf(\'laravel-mix\') + \'laravel-mix\'.length + 1); require(modulePath + \'package.json\').version;"',
     ];
 
-    public function checkNpm()
+    public function checkNodeVersion()
     {
-        $command = $this->npmCommands['check-npm'];
+        $command = $this->npmCommands['check-node'];
 
         $result = Utilities::runCliCommand($command);
 
         if (!$result->isSuccessful()) {
-            throw new Exception($this->getNpmRequiredMessage());
+            throw new Exception($this->getNodeRequiredMessage());
         }
 
-        $npmversion = $result->getLastOutputLine();
-
-        return $npmversion;
-    }
-
-    public function getRequiredNpmPackages(): array
-    {
-        return [];
-    }
-
-    public function checkNpmPackages()
-    {
-        $packages = $this->getRequiredNpmPackages();
-        $found    = [];
-
-        foreach ($packages as $package) {
-            if (!$version = $this->checkNpmPackage($package)) {
-                $message = $this->getPackageRequiredMessage();
-                $message = sprintf($message, $package);
-
-                throw new Exception($message);
-            }
-            $found[$package] = $version;
-        }
-
-        return $found;
-    }
-
-    public function checkNpmPackage($package)
-    {
-        foreach (['check-package', 'check-package-global'] as $env) {
-            $version = $this->checkNpmPackageInEnv($package, $env);
-            if (!$version instanceof CliCommandResult) {
-                return $version;
-            }
-        }
-
-        return false;
-    }
-
-    public function checkNpmPackageInEnv(string $package, string $env)
-    {
-        $check = $this->npmCommands[$env];
-        $check = sprintf($check, $package);
-
-        $result = Utilities::runCliCommand($check);
-
-        if (!$result->isSuccessful()) {
-            return $result;
-        }
-
-        $output = $result->getOutput();
-        if (!count($output)) {
-            return $result;
-        }
-
-        if (!$version = $this->extractPackageVersion($package, $output)) {
-            return $result;
-        }
+        $version = $result->getLastOutputLine();
 
         return $version;
     }
 
-    public function getNpmRequiredMessage()
+    public function checkMixVersion()
     {
-        return 'npm is required. ' .
-               'To learn how to install node.js and npm, ' .
-               'please visit https://docs.npmjs.com/getting-started/' .
-               'installing-node#install-npm--manage-npm-versions';
-    }
+        $command = $this->npmCommands['check-laravel-mix'];
 
-    public function getPackageRequiredMessage()
-    {
-        return 'npm package "%s" is required.' .
-               'Try running "npm install %1$s"';
-    }
+        $result = Utilities::runCliCommand($command);
 
-    protected function extractPackageVersion(string $package, array $outputLines)
-    {
-        foreach ($outputLines as $line) {
-            $pos = strpos($line, '@');
-            if (false === strpos($line, $package) || false === $pos) {
-                continue;
-            }
-
-            return substr($line, $pos + 1);
+        if (!$result->isSuccessful()) {
+            throw new Exception($this->getMixRequiredMessage());
         }
+
+        $version = $result->getLastOutputLine();
+
+        return $version;
     }
+
 }
