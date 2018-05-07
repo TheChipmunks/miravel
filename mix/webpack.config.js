@@ -18,7 +18,7 @@ mix.options({
 });
 
 if(1 === versionCompare(String(MixVersion), '1.9.9')){
-	let ComponentFactory = require(LaravelMixPath + '/src/components/ComponentFactory');
+	var ComponentFactory = require(LaravelMixPath + '/src/components/ComponentFactory');
 	new ComponentFactory().installAll();
 }
 
