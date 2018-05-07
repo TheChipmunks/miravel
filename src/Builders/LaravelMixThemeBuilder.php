@@ -23,9 +23,7 @@ use Miravel\Utilities;
 class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
     ThemeBuilderInterface
 {
-    use InteractsWithNpm {
-        checkNpm as traitCheckNpm;
-    }
+    use InteractsWithNpm;
 
     protected $buildCommand             = 'node %s NODE_ENV=%s %s' .
                                           ' --progress' .
@@ -112,9 +110,9 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
 
         $this->report('Checking dependencies and requirements...');
 
-        $this->checkNpm();
+        $this->checkNode();
 
-        $this->checkNpmPackages();
+        $this->checkMix();
 
         $this->report('Requirement check complete.');
     }
@@ -225,51 +223,32 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
         $this->cli->line($message);
     }
 
-    public function getNpmRequiredMessage()
+    public function getNodeRequiredMessage()
     {
-        return 'npm is required to run the Laravel Mix Theme Builder. ' .
-               'To learn how to install node.js and npm, ' .
-               'please visit https://docs.npmjs.com/getting-started/' .
-               'installing-node#install-npm--manage-npm-versions';
+        return 'node is required to run the Laravel Mix Theme Builder.';
     }
 
-    public function getPackageRequiredMessage()
+    public function getMixRequiredMessage()
     {
-        return 'npm package "%s" is required to run the Laravel Mix ' .
-               'Theme Builder. Try running "npm install %1$s"';
+        return 'node module "laravel-mix" is required to run the Theme Builder. Try running "npm install laravel-mix"';
     }
 
-    public function checkNpm()
+    public function checkNode()
     {
-        $this->report("npm ...\n");
-        $version = $this->traitCheckNpm();
+        $this->report("node ...\n");
+        $version = $this->checkNodeVersion();
         $this->report("\033[1A\033[1A\033[1A");
-        $this->report(sprintf("npm found, version %s", $version));
+        $this->report(sprintf("node found, version %s", $version));
     }
 
-    public function checkNpmPackages()
+    public function checkMix()
     {
-        $packages = $this->getRequiredNpmPackages();
-        
-        foreach ($packages as $package) {
-            $this->report("{$package} ...\n");
-            if (!$version = $this->checkNpmPackage($package)) {
-                $message = $this->getPackageRequiredMessage();
-                $message = sprintf($message, $package);
-                
-                throw new \Exception($message);
-            }
-            if($package == 'laravel-mix'){
-                $this->mixVersion = $version;
-            }
-            $this->report("\033[1A\033[1A\033[1A");
-            $this->report(sprintf('%s found, version %s', $package, $version));
-        }
+        $this->report("laravel-mix ...\n");
+        $version = $this->checkMixVersion();
+        $this->report("\033[1A\033[1A\033[1A");
+        $this->report(sprintf("laravel-mix found, version %s", $version));
     }
 
-    public function getRequiredNpmPackages()
-    {
-        return (array)$this->requiredNpmPackages;
-    }
+  
 
 }
