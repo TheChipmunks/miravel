@@ -1,8 +1,10 @@
 let mix = require('laravel-mix');
+let versionCompare = require('./versionCompare');
 let fs = require('fs');
 let argv = require('yargs').argv;
 
 global.ThemePath =  argv.env.themepath;
+global.MixVersion =  argv.env.mix_version;
 global.RootPath =  Mix.paths.root();
 global.LaravelMixPath =  path.resolve(RootPath, 'node_modules/laravel-mix/');
 global.File = require('./File');
@@ -15,15 +17,10 @@ mix.options({
     clearConsole: false
 });
 
-fs.exists(LaravelMixPath + '/src/components/ComponentFactory.js', function(exists) {
-	console.log(exists);
-    if (exists) {
-    		let ComponentFactory = require(LaravelMixPath + '/src/components/ComponentFactory');
-    		new ComponentFactory().installAll();
-    } else {
-        console.log(LaravelMixPath + '/src/components/ComponentFactory.js' + ' not exists');
-    }
-});
+if(1 === versionCompare(String(MixVersion), '1.9.9')){
+	let ComponentFactory = require(LaravelMixPath + '/src/components/ComponentFactory');
+	new ComponentFactory().installAll();
+}
 
 require(Mix.paths.mix());
 
