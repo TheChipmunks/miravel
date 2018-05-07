@@ -31,6 +31,7 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
                                           ' --progress' .
                                           ' --hide-modules' .
                                           ' --config=%s' .
+                                          ' --env.mix_version=%s' .
                                           ' --env.themepath=%s' .
                                           ' --env.mixfile=%s';
 
@@ -43,6 +44,8 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
     protected $defaultWebpackConfig     = 'vendor' . DIRECTORY_SEPARATOR . 'miravel' . DIRECTORY_SEPARATOR . 'miravel' . DIRECTORY_SEPARATOR . 'mix' . DIRECTORY_SEPARATOR . 'webpack.config.js';
 
     protected $defaultMixFileName       = 'webpack.mix.js';
+
+    protected $mixVersion               = null;
 
     /**
      * @var string
@@ -97,6 +100,7 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
             $this->getEnv(),
             $this->webpackJs,
             $this->defaultWebpackConfig,
+            $this->mixVersion,
             $themePath,
             $mixFilePath
         );
@@ -258,6 +262,9 @@ class LaravelMixThemeBuilder extends CommandLineThemeBuilder implements
                 $message = sprintf($message, $package);
                 
                 throw new \Exception($message);
+            }
+            if($package == 'laravel-mix'){
+                $this->mixVersion = $version;
             }
             $this->report("\033[1A\033[1A\033[1A");
             $this->report(sprintf('%s found, version %s', $package, $version));
