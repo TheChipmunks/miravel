@@ -1,12 +1,14 @@
+let moduleName = 'laravel-mix'
+global.modulePath = require.resolve('laravel-mix')
+modulePath = modulePath.substring(0, modulePath.indexOf(moduleName) + moduleName.length + 1)
+
+let modulePackage = require(modulePath + 'package.json')
 let mix = require('laravel-mix');
 let versionCompare = require('./versionCompare');
-let fs = require('fs');
 let argv = require('yargs').argv;
 
-global.ThemePath =  argv.env.themepath;
-global.MixVersion =  argv.env.mix_version;
-global.RootPath =  Mix.paths.root();
-global.LaravelMixPath =  path.resolve(RootPath, 'node_modules/laravel-mix/');
+global.ThemePath = argv.env.themepath;
+global.MixVersion = modulePackage.version;
 global.File = require('./File');
 
 console.log("Theme: " + ThemePath);
@@ -18,7 +20,7 @@ mix.options({
 });
 
 if(1 === versionCompare(String(MixVersion), '1.9.9')){
-	let ComponentFactory = require(LaravelMixPath + '/src/components/ComponentFactory');
+	let ComponentFactory = require(modulePath + 'src/components/ComponentFactory');
 	new ComponentFactory().installAll();
 }
 
@@ -26,6 +28,6 @@ require(Mix.paths.mix());
 
 Mix.dispatch('init', Mix);
 
-let WebpackConfig = require(LaravelMixPath + '/src/builder/WebpackConfig');
+let WebpackConfig = require(modulePath + 'src/builder/WebpackConfig');
 
 module.exports = new WebpackConfig().build();
