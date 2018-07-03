@@ -82,13 +82,14 @@ return [
     ],
 
     'paths' => [
-        'vendor'  => base_path('vendor/miravel/miravel/resources/themes'),
-        'app'     => resource_path('themes'),
+        'vendor'  => resource_path('themes/app'),
+        'app'     => resource_path('themes/vendor'),
 
         'public'  => public_path('miravel'),
         'views'   => resource_path('views'),
         'storage' => storage_path('miravel'),
 
+        // the relative url that corresponds to the 'public' path above
         'web'     => '/miravel',
     ],
 ];
